@@ -1,0 +1,13 @@
+# DataSource Config
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql:3306/vueblog?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+
+shiro-redis:
+  enable: true
+  redis-manager:
+    host: redis:6379 # 容器部署所以可以直接用redis获取ip
+
