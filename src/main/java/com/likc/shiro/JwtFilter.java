@@ -1,7 +1,6 @@
 package com.likc.shiro;
 
-import cn.hutool.http.server.HttpServerRequest;
-import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.likc.common.lang.Result;
 import com.likc.util.JwtUtils;
 import io.jsonwebtoken.Claims;
@@ -26,6 +25,9 @@ public class JwtFilter extends AuthenticatingFilter {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Override
     protected AuthenticationToken createToken(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
@@ -66,11 +68,10 @@ public class JwtFilter extends AuthenticatingFilter {
 
         Throwable throwable = e.getCause() == null ? e : e.getCause();
 
-        Result result = Result.fail(throwable.getMessage());
-
-        String json = JSONUtil.toJsonStr(result);
+        Result<Void> result = new Result<>(400, throwable.getMessage());
 
         try {
+            String json = objectMapper.writeValueAsString(result);
             httpServletResponse.getWriter().print(json);
         } catch (IOException ioException) {
             ioException.printStackTrace();

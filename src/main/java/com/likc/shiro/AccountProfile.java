@@ -7,7 +7,7 @@ import java.io.Serializable;
 @Data
 public class AccountProfile implements Serializable {
 
-    private Long uid;
+    private Long id;
 
     private String userName;
 

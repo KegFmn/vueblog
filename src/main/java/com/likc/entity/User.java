@@ -1,11 +1,6 @@
 package com.likc.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-
-import java.time.LocalDateTime;
-import java.io.Serializable;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,6 +8,9 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -22,8 +20,8 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "uid", type = IdType.AUTO)
-    private Long uid;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
     @NotBlank(message = "昵称不能为空")
     private String userName;

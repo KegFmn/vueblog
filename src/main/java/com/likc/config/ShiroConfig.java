@@ -53,7 +53,7 @@ public class ShiroConfig {
         securityManager.setSessionManager(sessionManager);
 
         // 设置自定义用户ID
-        redisCacheManager.setPrincipalIdFieldName("uid");
+        redisCacheManager.setPrincipalIdFieldName("id");
         // inject redisCacheManager
         securityManager.setCacheManager(redisCacheManager);
         /*
@@ -70,26 +70,30 @@ public class ShiroConfig {
         return securityManager;
     }
 
-    @Bean
-    public ShiroFilterChainDefinition shiroFilterChainDefinition() {
-        DefaultShiroFilterChainDefinition chainDefinition = new DefaultShiroFilterChainDefinition();
-        Map<String, String> filterMap = new LinkedHashMap<>();
-        filterMap.put("/**", "jwt"); // 主要通过注解方式校验权限
-        chainDefinition.addPathDefinitions(filterMap);
-        return chainDefinition;
-    }
     @Bean("shiroFilterFactoryBean")
     public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager,
                                                          ShiroFilterChainDefinition shiroFilterChainDefinition) {
         ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
+        //shiroFilterFactoryBean与securityManager关联
         shiroFilter.setSecurityManager(securityManager);
 
         Map<String, Filter> filters = new HashMap<>();
+        // 添加自定义拦截器jwtFilter到shiro的内置拦截过滤器
         filters.put("jwt", jwtFilter);
         shiroFilter.setFilters(filters);
 
         Map<String, String> filterMap = shiroFilterChainDefinition.getFilterChainMap();
+        // shiroFilterFactoryBean与shiroFilterChainDefinition关联
         shiroFilter.setFilterChainDefinitionMap(filterMap);
         return shiroFilter;
+    }
+    @Bean
+    public ShiroFilterChainDefinition shiroFilterChainDefinition() {
+        DefaultShiroFilterChainDefinition chainDefinition = new DefaultShiroFilterChainDefinition();
+        Map<String, String> filterMap = new LinkedHashMap<>();
+        // 所有请求都通过自定义的jwtFilter拦截器
+        filterMap.put("/**", "jwt");
+        chainDefinition.addPathDefinitions(filterMap);
+        return chainDefinition;
     }
 }

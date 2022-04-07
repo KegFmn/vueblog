@@ -1,15 +1,16 @@
 package com.likc.controller;
 
-import cn.hutool.core.map.MapUtil;
-import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.likc.common.dto.LoginDto;
+import com.likc.dto.LoginDto;
 import com.likc.common.lang.Result;
 import com.likc.entity.User;
 import com.likc.service.UserService;
 import com.likc.util.JwtUtils;
+import com.likc.vo.LoginVo;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
@@ -28,34 +29,31 @@ public class AccountController {
 
     @CrossOrigin
     @PostMapping("/login")
-    public Result login(@Validated @RequestBody LoginDto loginDto, HttpServletResponse response){
+    public Result<LoginVo> login(@Validated @RequestBody LoginDto loginDto, HttpServletResponse response){
 
         User user = userService.getOne(new QueryWrapper<User>().eq("user_name", loginDto.getUserName()));
         Assert.notNull(user,"用户不存在");
 
-        if (!user.getPassWord().equals(SecureUtil.md5(loginDto.getPassWord()))){
-            return Result.fail("密码不正确");
+        if (!user.getPassWord().equals(DigestUtils.md5Hex(loginDto.getPassWord()))){
+            return new Result<>(400, "密码不正确");
         }
 
-        String jwt = jwtUtils.generateToken(user.getUid());
+        String jwt = jwtUtils.generateToken(user.getId());
         response.setHeader("Authorization", jwt);
         response.setHeader("Access-Control-Expose-Headers", "Authorization");
 
-        return Result.succ(MapUtil.builder()
-                .put("uid",user.getUid())
-                .put("userName",user.getUserName())
-                .put("avatar",user.getAvatar())
-                .put("email",user.getEmail())
-                .map()
-        );
+        LoginVo loginVo = new LoginVo();
+        BeanUtils.copyProperties(user, loginVo);
+
+        return new Result<>(200, "登录成功", loginVo);
     }
 
     @RequiresAuthentication
     @GetMapping("/logout")
-    public Result logout(){
+    public Result<Void> logout(){
 
         SecurityUtils.getSubject().logout();
-        return Result.succ(null);
+        return new Result<>(200, "退出成功");
     }
 
 }

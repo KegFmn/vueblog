@@ -1,7 +1,7 @@
 package com.likc.mapper;
 
-import com.likc.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.likc.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

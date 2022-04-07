@@ -1,14 +1,18 @@
 package com.likc.controller;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.likc.common.lang.Result;
+import com.likc.dto.TypeDto;
+import com.likc.entity.Blog;
 import com.likc.entity.Type;
+import com.likc.service.BlogService;
 import com.likc.service.TypeService;
 import com.likc.util.ShiroUtil;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -20,50 +24,65 @@ public class TypeController {
     @Autowired
     private TypeService typeService;
 
+    @Autowired
+    private BlogService blogService;
+
 
     @GetMapping("/types")
-    public Result list(){
+    public Result<List<Type>> list(){
         QueryWrapper<Type> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status",0)
-                .select("tid","type_name")
-                .orderByAsc("created");
+                .select("id","type_name")
+                .orderByDesc("created");
 
-        List list = typeService.list(queryWrapper);
+        List<Type> list = typeService.list(queryWrapper);
 
-        return Result.succ(list);
+        return new Result<>(200, "请求成功", list);
     }
 
     @RequiresAuthentication
     @PostMapping("/type/save")
-    public Result save(@RequestBody Type type){
+    public Result<Void> save(@Validated @RequestBody TypeDto typeDto){
+
+        QueryWrapper<Type> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("BINARY type_name", typeDto.getTypeName());
+
+        Type tempType = typeService.getOne(queryWrapper, false);
+
+        Assert.isNull(tempType,"该类型已存在");
 
         Type temp = null;
-        QueryWrapper<Type> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("typename",type.getTypeName());
+        if (typeDto.getId() != null){
+            temp = typeService.getById(typeDto.getId());
+            //只能编辑自己的文章
+            Assert.isTrue(temp.getUserId().longValue() == ShiroUtil.getProfile().getId().longValue(),"没有权限编辑");
+        }else {
+            temp = new Type();
+            temp.setUserId(ShiroUtil.getProfile().getId());
+            temp.setCreated(LocalDateTime.now());
+            temp.setStatus(0);
+        }
 
-        temp = typeService.getOne(queryWrapper, false);
+        BeanUtils.copyProperties(typeDto, temp, "id","userId","created","status", "blogs");
 
-        Assert.isNull(temp,"该类型已存在");
+        typeService.saveOrUpdate(temp);
 
-        temp = new Type();
-        temp.setUserId(ShiroUtil.getProfile().getUid());
-        temp.setCreated(LocalDateTime.now());
-        temp.setStatus(0);
-
-        BeanUtil.copyProperties(type,temp,"id","userId","created","status");
-        typeService.save(temp);
-
-        return Result.succ(null);
+        return new Result<>(200, "保存成功");
     }
 
     @RequiresAuthentication
-    @GetMapping("type/delete")
-    public Result delete(@RequestParam(name = "typename") String typename){
-        QueryWrapper<Type> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("typename", typename);
-        typeService.remove(queryWrapper);
+    @PostMapping("type/delete")
+    public Result<Void> delete(@Validated @RequestBody TypeDto typeDto){
+        QueryWrapper<Type> typeWrapper = new QueryWrapper<>();
+        typeWrapper.eq("BINARY type_name", typeDto.getTypeName());
+        typeService.remove(typeWrapper);
 
-        return Result.succ(null);
+        QueryWrapper<Blog> blogWrapper = new QueryWrapper<>();
+        blogWrapper.eq("type_id", typeDto.getId());
+
+        blogService.remove(blogWrapper);
+
+        return new Result<>(200, "删除成功");
     }
 
 
