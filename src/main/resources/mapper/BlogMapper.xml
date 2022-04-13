@@ -13,17 +13,15 @@
         <result property="typeId" column="type_id"/>
         <result property="userId" column="user_id"/>
         <association property="type" column="type_id" javaType="com.likc.entity.Type">
-            <result property="id" column="id"/>
             <result property="typeName" column="type_name"/>
         </association>
         <association property="user" column="user_id" javaType="com.likc.entity.User">
-            <result property="id" column="id"/>
             <result property="userName" column="user_name"/>
         </association>
     </resultMap>
     
     <select id="selectBlog" parameterType="long" resultMap="blogResultMap">
-        select b.*, u.id, u.user_name, t.id, t.type_name
+        select b.*, u.user_name, t.type_name
         from m_blog b, m_type t, m_user u
         where b.type_id = t.id
         and b.user_id = u.id
