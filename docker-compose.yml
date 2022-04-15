@@ -29,6 +29,8 @@ services:
 
   vueblog:
     image: vueblog:latest
+    volumes:
+      - /usr/local/docker/vueblog:/usr/data
     build: .
     ports:
       - 8081:8081
