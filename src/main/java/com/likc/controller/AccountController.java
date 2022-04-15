@@ -27,7 +27,6 @@ public class AccountController {
     @Autowired
     private JwtUtils jwtUtils;
 
-    @CrossOrigin
     @PostMapping("/login")
     public Result<LoginVo> login(@Validated @RequestBody LoginDto loginDto, HttpServletResponse response){
 
