@@ -8,6 +8,7 @@
         <result property="description" column="description"/>
         <result property="content" column="content"/>
         <result property="created" column="created"/>
+        <result property="updated" column="updated"/>
         <result property="original" column="original"/>
         <result property="status" column="status"/>
         <result property="typeId" column="type_id"/>

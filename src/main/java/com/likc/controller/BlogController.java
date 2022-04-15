@@ -65,6 +65,7 @@ public class BlogController {
         Blog temp = null;
         if (blogDto.getId() != null){
             temp = blogService.getById(blogDto.getId());
+            temp.setUpdated(LocalDateTime.now());
             //只能编辑自己的文章
             Assert.isTrue(temp.getUserId().longValue() == ShiroUtil.getProfile().getId().longValue(),"没有权限编辑");
 
@@ -72,11 +73,11 @@ public class BlogController {
             temp = new Blog();
             temp.setUserId(ShiroUtil.getProfile().getId());
             temp.setCreated(LocalDateTime.now());
+            temp.setUpdated(LocalDateTime.now());
             temp.setStatus(0);
-
         }
 
-        BeanUtils.copyProperties(blogDto,temp,"id","userId","created","status");
+        BeanUtils.copyProperties(blogDto, temp, "id","userId","created","updated","status");
         blogService.saveOrUpdate(temp);
 
         return new Result<>(200, "编辑成功");

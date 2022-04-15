@@ -40,6 +40,9 @@ public class Blog implements Serializable {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime created;
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private LocalDateTime updated;
+
     @NotNull(message = "文章是否原创不能为空")
     private Integer original;
 
