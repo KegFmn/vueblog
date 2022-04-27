@@ -7,7 +7,9 @@ import com.likc.entity.Blog;
 import com.likc.entity.Type;
 import com.likc.service.BlogService;
 import com.likc.service.TypeService;
+import com.likc.util.RedisUtils;
 import com.likc.util.ShiroUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RestController
 public class TypeController {
 
@@ -26,6 +29,9 @@ public class TypeController {
 
     @Autowired
     private BlogService blogService;
+
+    @Autowired
+    private RedisUtils redisUtils;
 
 
     @GetMapping("/types")

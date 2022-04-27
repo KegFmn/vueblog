@@ -8,6 +8,7 @@ import com.likc.common.lang.Result;
 import com.likc.dto.BlogDto;
 import com.likc.entity.Blog;
 import com.likc.service.BlogService;
+import com.likc.util.RedisUtils;
 import com.likc.util.ShiroUtil;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.BeanUtils;
@@ -32,6 +33,9 @@ public class BlogController {
     @Autowired
     private BlogService blogService;
 
+    @Autowired
+    private RedisUtils redisUtils;
+
     @GetMapping("blogs")
     public Result<IPage<Blog>> list(@RequestParam(name = "currentPage", defaultValue = "1") Integer currentPage,
                        @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize,
@@ -41,7 +45,7 @@ public class BlogController {
 
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(typeId != 0, "type_id", typeId)
-                .orderByDesc("created");
+                .orderByDesc("updated");
 
 
         IPage<Blog> pageDate = blogService.page(page, queryWrapper);
@@ -62,13 +66,14 @@ public class BlogController {
     @PostMapping("blog/edit")
     public Result<Void> edit(@Validated @RequestBody BlogDto blogDto){
 
+        boolean flag = true;
         Blog temp = null;
         if (blogDto.getId() != null){
             temp = blogService.getById(blogDto.getId());
             temp.setUpdated(LocalDateTime.now());
             //只能编辑自己的文章
             Assert.isTrue(temp.getUserId().longValue() == ShiroUtil.getProfile().getId().longValue(),"没有权限编辑");
-
+            flag = false;
         }else {
             temp = new Blog();
             temp.setUserId(ShiroUtil.getProfile().getId());
@@ -80,7 +85,11 @@ public class BlogController {
         BeanUtils.copyProperties(blogDto, temp, "id","userId","created","updated","status");
         blogService.saveOrUpdate(temp);
 
-        return new Result<>(200, "编辑成功");
+        if (flag) {
+            redisUtils.incr("blogTotal", 1);
+        }
+
+        return new Result<>(200, "保存成功");
     }
 
     @RequiresAuthentication
@@ -90,6 +99,8 @@ public class BlogController {
         Blog temp = blogService.getById(blog.getId());
         Assert.isTrue(temp.getUserId().longValue() == ShiroUtil.getProfile().getId().longValue(),"没有权限删除");
         blogService.removeById(temp.getId());
+
+        redisUtils.decr("blogTotal", 1);
 
         return new Result<>(200, "删除成功");
 
