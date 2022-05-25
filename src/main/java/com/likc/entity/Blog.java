@@ -46,9 +46,6 @@ public class Blog implements Serializable {
     @NotNull(message = "文章是否原创不能为空")
     private Integer original;
 
-    @TableLogic
-    private Integer status;
-
     @TableField(exist = false)
     private Type type;
 
