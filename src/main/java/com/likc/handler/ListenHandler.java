@@ -46,7 +46,6 @@ public class ListenHandler {
         List<Monitor> monitors = monitorService.list();
 
         QueryWrapper<Blog> blogQueryWrapper = new QueryWrapper<>();
-        blogQueryWrapper.eq("status", 0);
         int blogConut = blogService.count(blogQueryWrapper);
 
         Monitor monitor = null;

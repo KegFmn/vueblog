@@ -1,4 +1,6 @@
 server:
+  servlet:
+    context-path: /api
   port: 8081
 # DataSource Config
 
@@ -19,6 +21,10 @@ spring:
     port: 6379
     database: 0
     host: redis
+  elasticsearch:
+    uris: elasticsearch:9200
+    username:
+    password:
 
 shiro-redis:
   enable: true

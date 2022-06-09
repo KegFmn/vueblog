@@ -79,10 +79,9 @@ public class BlogController {
             temp.setUserId(ShiroUtil.getProfile().getId());
             temp.setCreated(LocalDateTime.now());
             temp.setUpdated(LocalDateTime.now());
-            temp.setStatus(0);
         }
 
-        BeanUtils.copyProperties(blogDto, temp, "id","userId","created","updated","status");
+        BeanUtils.copyProperties(blogDto, temp, "id","userId","created","updated");
         blogService.saveOrUpdate(temp);
 
         if (flag) {

@@ -3,6 +3,7 @@ package com.likc.controller;
 import com.likc.common.lang.Result;
 import com.likc.search.CollectDoc;
 import com.likc.service.SearchService;
+import com.likc.vo.SearchBlogVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,11 +28,11 @@ public class SearchController {
     private SearchService searchService;
 
     @GetMapping("/search")
-    public Result<Page<CollectDoc>> list(@RequestParam(name = "currentPage", defaultValue = "1") Integer currentPage,
+    public Result<Page<SearchBlogVo>> list(@RequestParam(name = "currentPage", defaultValue = "1") Integer currentPage,
                                     @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize,
                                     @RequestParam(name = "q", defaultValue = "") String q){
 
-        Page<CollectDoc> page = searchService.search(q, getPage(currentPage, pageSize));
+        Page<SearchBlogVo> page = searchService.search(q, getPage(currentPage, pageSize));
 
         return new Result<>(200, "请求成功", page);
 

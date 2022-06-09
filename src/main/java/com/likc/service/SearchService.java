@@ -2,6 +2,7 @@ package com.likc.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.likc.search.CollectDoc;
+import com.likc.vo.SearchBlogVo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,5 +13,5 @@ import org.springframework.data.domain.Pageable;
  */
 public interface SearchService extends IService<CollectDoc> {
 
-    Page<CollectDoc> search(String keyword, Pageable page);
+    Page<SearchBlogVo> search(String keyword, Pageable page);
 }

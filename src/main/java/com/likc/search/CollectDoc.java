@@ -11,9 +11,11 @@ import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 /**
@@ -31,8 +33,11 @@ public class CollectDoc {
     @Field(name = "typeId", type = FieldType.Long)
     private Long typeId;
 
-    @Field(type = FieldType.Keyword)
-    private String typaName;
+    @Field(name = "typeName", type = FieldType.Text)
+    private String typeName;
+
+    @Field(type = FieldType.Text)
+    private String description;
 
     @Field(type = FieldType.Text, searchAnalyzer = "ik_smart", analyzer = "ik_max_word")
     private String title;
@@ -40,7 +45,7 @@ public class CollectDoc {
     @Field(type = FieldType.Text, searchAnalyzer = "ik_smart", analyzer = "ik_max_word")
     private String content;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ssXXX")
     @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "MMM d HH:mm:ss||yyyy-MM-dd HH:mm:ss.SSS||HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||strict_date_optional_time||epoch_millis")
     private String updated;
 
