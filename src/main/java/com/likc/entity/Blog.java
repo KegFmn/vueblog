@@ -46,10 +46,4 @@ public class Blog implements Serializable {
     @NotNull(message = "文章是否原创不能为空")
     private Integer original;
 
-    @TableField(exist = false)
-    private Type type;
-
-    @TableField(exist = false)
-    private User user;
-
 }

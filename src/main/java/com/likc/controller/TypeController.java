@@ -5,13 +5,14 @@ import com.likc.common.lang.Result;
 import com.likc.dto.TypeDto;
 import com.likc.entity.Blog;
 import com.likc.entity.Type;
+import com.likc.mapstruct.MapStructConverter;
 import com.likc.service.BlogService;
 import com.likc.service.TypeService;
 import com.likc.util.RedisUtils;
 import com.likc.util.ShiroUtil;
+import com.likc.vo.TypeVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -31,11 +33,11 @@ public class TypeController {
     private BlogService blogService;
 
     @Autowired
-    private RedisUtils redisUtils;
+    private MapStructConverter mapStructConverter;
 
 
     @GetMapping("/types")
-    public Result<List<Type>> list(){
+    public Result<List<TypeVo>> list(){
         QueryWrapper<Type> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status",0)
                 .select("id","type_name")
@@ -43,7 +45,9 @@ public class TypeController {
 
         List<Type> list = typeService.list(queryWrapper);
 
-        return new Result<>(200, "请求成功", list);
+        List<TypeVo> typeVos = list.stream().map(item -> mapStructConverter.typeEntity2Vo(item)).collect(Collectors.toList());
+
+        return new Result<>(200, "请求成功", typeVos);
     }
 
     @RequiresAuthentication
@@ -69,7 +73,7 @@ public class TypeController {
             temp.setStatus(0);
         }
 
-        BeanUtils.copyProperties(typeDto, temp, "id","userId","created","status", "blogs");
+        temp.setTypeName(typeDto.getTypeName());
 
         typeService.saveOrUpdate(temp);
 

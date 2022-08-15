@@ -2,22 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.likc.mapper.BlogMapper">
 
-    <resultMap id="blogResultMap" type="com.likc.entity.Blog">
+    <resultMap id="blogResultMap" type="com.likc.vo.BlogDetailsVo">
         <id property="id" column="id"/>
         <result property="title" column="title"/>
-        <result property="description" column="description"/>
         <result property="content" column="content"/>
-        <result property="created" column="created"/>
         <result property="updated" column="updated"/>
         <result property="original" column="original"/>
-        <result property="typeId" column="type_id"/>
         <result property="userId" column="user_id"/>
-        <association property="type" column="type_id" javaType="com.likc.entity.Type">
-            <result property="typeName" column="type_name"/>
-        </association>
-        <association property="user" column="user_id" javaType="com.likc.entity.User">
-            <result property="userName" column="user_name"/>
-        </association>
+        <result property="typeName" column="type_name"/>
+        <result property="userName" column="user_name"/>
     </resultMap>
     
     <select id="selectBlog" parameterType="long" resultMap="blogResultMap">

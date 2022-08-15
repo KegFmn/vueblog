@@ -7,9 +7,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.likc.common.lang.Result;
 import com.likc.dto.BlogDto;
 import com.likc.entity.Blog;
+import com.likc.mapstruct.MapStructConverter;
 import com.likc.service.BlogService;
 import com.likc.util.RedisUtils;
 import com.likc.util.ShiroUtil;
+import com.likc.vo.BlogDetailsVo;
+import com.likc.vo.BlogSimpleVo;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +39,11 @@ public class BlogController {
     @Autowired
     private RedisUtils redisUtils;
 
+    @Autowired
+    private MapStructConverter mapStructConverter;
+
     @GetMapping("blogs")
-    public Result<IPage<Blog>> list(@RequestParam(name = "currentPage", defaultValue = "1") Integer currentPage,
+    public Result<IPage<BlogSimpleVo>> list(@RequestParam(name = "currentPage", defaultValue = "1") Integer currentPage,
                        @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize,
                        @RequestParam(name = "typeId", defaultValue = "0") Long typeId ){
 
@@ -50,16 +56,18 @@ public class BlogController {
 
         IPage<Blog> pageDate = blogService.page(page, queryWrapper);
 
-        return new Result<>(200, "请求成功", pageDate);
+        IPage<BlogSimpleVo> pageVoDate = pageDate.convert(blog -> mapStructConverter.simpleEntity2Vo(blog));
+
+        return new Result<>(200, "请求成功", pageVoDate);
     }
 
     @GetMapping("blog/{id}")
-    public Result<Blog> detail(@PathVariable(name = "id") Long id){
+    public Result<BlogDetailsVo> detail(@PathVariable(name = "id") Long id){
 
-        Blog blog = blogService.selectBlog(id);
-        Assert.notNull(blog,"该博客已被删除");
+        BlogDetailsVo blogDetailsVo = blogService.selectBlog(id);
+        Assert.notNull(blogDetailsVo,"该博客已被删除");
 
-        return new Result<>(200, "请求成功", blog);
+        return new Result<>(200, "请求成功", blogDetailsVo);
     }
 
     @RequiresAuthentication

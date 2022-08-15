@@ -23,7 +23,7 @@ public class MonitorTask {
     @Autowired
     private MonitorService monitorService;
 
-    @Scheduled(cron = "0 0/30 * * * ?")
+    @Scheduled(cron = "0 0 0/1 * * ? ")
     public void monitorTask() {
         log.info("定时任务写入数据库开始");
         Monitor monitor = new Monitor();

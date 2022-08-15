@@ -11,7 +11,7 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginVo {
+public class UserVo {
 
     private Long id;
 
