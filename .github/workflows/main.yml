@@ -28,6 +28,7 @@ jobs:
           host: ${{ secrets.USER_HOST }}
           username: ${{ secrets.USER_NAME }}
           password: ${{ secrets.USER_PASS }}
+          concurrency: 20
           local: target/vueblog-0.0.1-SNAPSHOT.jar
           remote: /usr/local/docker/vueblog/vueblog-0.0.1-SNAPSHOT.jar
 
