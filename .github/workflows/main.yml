@@ -23,14 +23,17 @@ jobs:
         run: mvn -B -DskipTests=true package --file pom.xml
 
       - name: Deploy
-        uses: garygrossgarten/github-action-scp@release
+        uses: cross-the-world/scp-pipeline@master
+        env:
+          WELCOME: "ssh scp ssh pipelines"
+          LASTSSH: "Doing something after copying"
         with:
           host: ${{ secrets.USER_HOST }}
-          username: ${{ secrets.USER_NAME }}
-          password: ${{ secrets.USER_PASS }}
-          concurrency: 20
+          user: ${{ secrets.USER_NAME }}
+          pass: ${{ secrets.USER_PASS }}
+          connect_timeout: 10s
           local: target/vueblog-0.0.1-SNAPSHOT.jar
-          remote: /usr/local/docker/vueblog/vueblog-0.0.1-SNAPSHOT.jar
+          remote: /usr/local/docker/vueblog
 
       - name: Docker Restart
         uses: appleboy/ssh-action@master
