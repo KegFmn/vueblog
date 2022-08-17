@@ -82,11 +82,10 @@ services:
     restart: always
 
   vueblog:
-    image: vueblog:latest
+    image: kegfmn/vueblog:latest
     container_name: vueblog
     volumes:
       - /usr/local/docker/vueblog:/usr/data
-    build: .
     ports:
       - "8081:8081"
     depends_on:
