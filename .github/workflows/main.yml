@@ -1,9 +1,9 @@
-
 #不使用docker镜像仓库
 name: VueBlog CI
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   compile:
