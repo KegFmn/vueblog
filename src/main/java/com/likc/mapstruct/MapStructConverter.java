@@ -8,7 +8,6 @@ import com.likc.vo.TypeVo;
 import com.likc.vo.UserVo;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import org.springframework.stereotype.Component;
 
 /**
  * @author likc

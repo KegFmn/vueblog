@@ -13,6 +13,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>vueblog</name>
     <description>vueblog</description>
+
     <properties>
         <java.version>1.8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -20,6 +21,7 @@
         <org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
         <org.projectlombok.version>1.18.22</org.projectlombok.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -153,23 +155,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <properties>
-                <spring.profiles.active>dev</spring.profiles.active>
-            </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>prd</id>
-            <properties>
-                <spring.profiles.active>prd</spring.profiles.active>
-            </properties>
-        </profile>
-    </profiles>
 
 </project>

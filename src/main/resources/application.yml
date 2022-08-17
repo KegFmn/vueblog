@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: @spring.profiles.active@
+    active: prd
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher # springboot升级2.6.0导致的
