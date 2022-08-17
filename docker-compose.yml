@@ -3,7 +3,7 @@ version: '3'
 services:
   nginx: # 服务名称，用户自定义
     image: nginx:latest  # 镜像版本
-    container_name: vueblog-naginx
+    container_name: vueblog-nginx
     ports:
       - "80:80"  # 暴露端口
       - "443:443"
