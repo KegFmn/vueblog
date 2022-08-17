@@ -20,7 +20,7 @@ jobs:
           cache: maven
 
       - name: Build
-        run: mvn clean package --file pom.xml
+        run: mvn -B -DskipTests=true package --file pom.xml
 
       - name: Deploy
         uses: garygrossgarten/github-action-scp@release
