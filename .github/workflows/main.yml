@@ -45,7 +45,7 @@ jobs:
           # 构建完成后 push
           push: true
           # github账号 tag
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/vueblog:$(date +%s)
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/vueblog:latest
 
       - name: Docker Pull and Run
         uses: appleboy/ssh-action@master
