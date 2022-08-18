@@ -37,7 +37,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       # 开始构建 在当前目录下找Dockerfile,也可以指定Dockerfile位置
-      - name: Build and push
+      - name: Docker Build and Push
         uses: docker/build-push-action@v3
         with:
           # 当前工作目录
