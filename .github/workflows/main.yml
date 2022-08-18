@@ -56,4 +56,4 @@ jobs:
           script: |
             cd ~
             nohup ./vueblog_start.sh &
-            tail -f nohup.out
+            docker-compose up -d
