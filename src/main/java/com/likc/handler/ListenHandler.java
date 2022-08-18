@@ -10,10 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -35,6 +37,9 @@ public class ListenHandler {
     @Autowired
     private BlogService blogService;
 
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+
     public ListenHandler(){
         log.info("开始初始化");
     }
@@ -43,15 +48,17 @@ public class ListenHandler {
     public void init() {
         log.info("监控数据初始化");
 
-        List<Monitor> monitors = monitorService.list();
+        redisUtils.del("visitTotal","blessTotal","blogTotal");
+
+        Monitor one = monitorService.getOne(new QueryWrapper<>(), false);
 
         QueryWrapper<Blog> blogQueryWrapper = new QueryWrapper<>();
-        int blogConut = blogService.count(blogQueryWrapper);
+        int blogCount = blogService.count(blogQueryWrapper);
 
-        Monitor monitor = null;
-        if (monitors.size() > 0) {
+        Monitor monitor;
+        if (one != null) {
             log.info("数据库已有数据");
-            monitor = monitors.get(0);
+            monitor = one;
         } else {
             log.info("数据库没有数据");
             monitor = new Monitor();
@@ -61,12 +68,13 @@ public class ListenHandler {
             monitor.setStatus(0);
             monitorService.save(monitor);
         }
+
         // 访客总数
         redisUtils.incr("visitTotal", monitor.getVisitTotal());
         // 留言总数
         redisUtils.incr("blessTotal", monitor.getBlessTotal());
         // 博客总数
-        redisUtils.incr("blogTotal", blogConut);
+        redisUtils.incr("blogTotal", blogCount);
 
         log.info("写入redis成功");
 
