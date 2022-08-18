@@ -55,5 +55,5 @@ jobs:
           password: ${{ secrets.USER_PASS }}
           script: |
             cd ~
-            nohup ./vueblog_start.sh &
+            sh vueblog_start.sh
             docker-compose up -d
