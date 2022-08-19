@@ -32,26 +32,34 @@ public class MonitorTask {
 
     @Scheduled(cron = "0 0 0/1 * * ? ")
     public void monitorTask() {
-        log.info("定时任务写入数据库开始");
         Monitor monitor = new Monitor();
-        
+
         RestTemplate restTemplate = new RestTemplate();
         StringBuilder builder = new StringBuilder("https://api.github.com");
         builder.append("/repos/KegFmn/vueblog-vuetify/issues/2");
         Map<String, Object> map = null;
         try {
             String object = restTemplate.getForObject(builder.toString(), String.class);
-            map = objectMapper.readValue(object, Map.class);
+            if (object != null) {
+                map = objectMapper.readValue(object, Map.class);
+            }
         } catch (Exception e) {
             log.error("定时同步github评论失败，异常={}", e.getMessage());
         }
-        int blessTotal = map.get("comments") == null ? 0 : (Integer) map.get("comments");
-        
-        if (blessTotal != 0) {
-            redisUtils.del("blessTotal");
-            redisUtils.incr("blessTotal", blessTotal);
+        Integer blessTotal = null;
+        if (map != null) {
+            blessTotal = (Integer) map.get("comments");
+            if (blessTotal != null) {
+                log.info("清除评论缓存");
+                redisUtils.del("blessTotal");
+                redisUtils.incr("blessTotal", blessTotal);
+                log.info("重新设置评论缓存");;
+            }
         }
 
+        log.info("定时同步github评论数量={}", blessTotal);
+
+        log.info("定时监控写入数据库开始");
         monitor.setVisitTotal(Long.valueOf(redisUtils.get("visitTotal").toString()));
         monitor.setBlessTotal(Long.valueOf(redisUtils.get("blessTotal").toString()));
         monitor.setBlogTotal(Long.valueOf(redisUtils.get("blogTotal").toString()));
@@ -60,6 +68,6 @@ public class MonitorTask {
         wrapper.eq("status", 0);
         monitorService.update(monitor, wrapper);
 
-        log.info("定时任务写入数据库成功");
+        log.info("定时监控写入数据库成功");
     }
 }

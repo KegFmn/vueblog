@@ -59,7 +59,7 @@ public class ListenHandler {
         Monitor one = monitorService.getOne(new QueryWrapper<>(), false);
 
         QueryWrapper<Blog> blogQueryWrapper = new QueryWrapper<>();
-        int blogCount = blogService.count(blogQueryWrapper);
+        Integer blogCount = blogService.count(blogQueryWrapper);
         
         RestTemplate restTemplate = new RestTemplate();
         StringBuilder builder = new StringBuilder("https://api.github.com");
@@ -67,11 +67,16 @@ public class ListenHandler {
         Map<String, Object> map = null;
         try {
             String object = restTemplate.getForObject(builder.toString(), String.class);
-            map = objectMapper.readValue(object, Map.class);
+            if (object != null) {
+                map = objectMapper.readValue(object, Map.class);
+            }
         } catch (Exception e) {
             log.error("同步github评论失败，异常={}", e.getMessage());
         }
-        int blessTotal = map.get("comments") == null ? 0 : (Integer) map.get("comments");
+        Integer blessTotal = null;
+        if (map != null) {
+            blessTotal = (Integer) map.get("comments");
+        }
 
         Monitor monitor;
         if (one != null) {
@@ -81,8 +86,8 @@ public class ListenHandler {
             log.info("数据库没有监控数据");
             monitor = new Monitor();
             monitor.setVisitTotal(0L);
-            monitor.setBlessTotal((long)blessTotal);
-            monitor.setBlogTotal((long)blogCount);
+            monitor.setBlessTotal(blessTotal != null ? blessTotal.longValue() : 0L);
+            monitor.setBlogTotal(blogCount.longValue());
             monitor.setStatus(0);
             monitorService.save(monitor);
         }
@@ -90,9 +95,9 @@ public class ListenHandler {
         // 访客总数
         redisUtils.incr("visitTotal", monitor.getVisitTotal());
         // 留言总数
-        redisUtils.incr("blessTotal", blessTotal == 0 ? monitor.getBlessTotal() : blessTotal);
+        redisUtils.incr("blessTotal", blessTotal == null ? monitor.getBlessTotal() : blessTotal.longValue());
         // 博客总数
-        redisUtils.incr("blogTotal", blogCount);
+        redisUtils.incr("blogTotal", blogCount.longValue());
 
         log.info("写入redis成功");
 

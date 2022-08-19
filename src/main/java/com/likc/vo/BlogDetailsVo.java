@@ -1,5 +1,6 @@
 package com.likc.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +21,7 @@ public class BlogDetailsVo {
     private String title;
     private String description;
     private String content;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private String updated;
     private Integer original;
 
