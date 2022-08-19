@@ -81,8 +81,8 @@ public class ListenHandler {
             log.info("数据库没有监控数据");
             monitor = new Monitor();
             monitor.setVisitTotal(0L);
-            monitor.setBlessTotal(blessTotal);
-            monitor.setBlogTotal(blogCount);
+            monitor.setBlessTotal((long)blessTotal);
+            monitor.setBlogTotal((long)blogCount);
             monitor.setStatus(0);
             monitorService.save(monitor);
         }
