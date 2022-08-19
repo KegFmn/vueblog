@@ -43,12 +43,17 @@ public class MonitorTask {
             String object = restTemplate.getForObject(builder.toString(), String.class);
             map = objectMapper.readValue(object, Map.class);
         } catch (Exception e) {
-            log.error("同步github评论失败，异常={}", e.getMessage());
+            log.error("定时同步github评论失败，异常={}", e.getMessage());
         }
         int blessTotal = map.get("comments") == null ? 0 : (Integer) map.get("comments");
+        
+        if (blessTotal != 0) {
+            redisUtils.del("blessTotal");
+            redisUtils.incr("blessTotal", blessTotal);
+        }
 
         monitor.setVisitTotal(Long.valueOf(redisUtils.get("visitTotal").toString()));
-        monitor.setBlessTotal(blessTotal == 0 ? Long.valueOf(redisUtils.get("blessTotal").toString()) : (long)blessTotal);
+        monitor.setBlessTotal(Long.valueOf(redisUtils.get("blessTotal").toString()));
         monitor.setBlogTotal(Long.valueOf(redisUtils.get("blogTotal").toString()));
 
         QueryWrapper<Monitor> wrapper = new QueryWrapper<>();
