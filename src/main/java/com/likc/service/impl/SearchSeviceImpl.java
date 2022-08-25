@@ -48,11 +48,8 @@ public class SearchSeviceImpl extends ServiceImpl<SearchMapper, CollectDoc> impl
         List<SearchBlogVo> collectDocs = searchHits.get().map(e ->{
             SearchBlogVo searchBlogVo = new SearchBlogVo();
             searchBlogVo.setId(e.getContent().getId());
-            searchBlogVo.setTypeId(e.getContent().getTypeId());
-            searchBlogVo.setTypeName(e.getContent().getTypeName());
             searchBlogVo.setDescription(e.getContent().getDescription());
             searchBlogVo.setTitle(e.getContent().getTitle());
-            searchBlogVo.setContent(e.getContent().getContent());
             searchBlogVo.setUpdated(LocalDateTime.parse(e.getContent().getUpdated(), dateTimeFormatter));
             return searchBlogVo;
         }).collect(Collectors.toList());

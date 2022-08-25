@@ -20,15 +20,9 @@ public class SearchBlogVo {
 
     private Long id;
 
-    private Long typeId;
-
-    private String typeName;
-
     private String description;
 
     private String title;
-
-    private String content;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime updated;
