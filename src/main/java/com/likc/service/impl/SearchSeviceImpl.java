@@ -54,9 +54,7 @@ public class SearchSeviceImpl extends ServiceImpl<SearchMapper, CollectDoc> impl
             return searchBlogVo;
         }).collect(Collectors.toList());
 
-        Page<SearchBlogVo> docPage = new PageImpl<>(collectDocs, page, searchHits.getTotalHits());
-
-        return docPage;
+        return new PageImpl<>(collectDocs, page, searchHits.getTotalHits());
     }
 
 }
