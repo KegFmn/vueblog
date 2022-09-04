@@ -11,9 +11,8 @@ import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
-
+import org.apache.commons.lang3.StringUtils;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -29,24 +28,39 @@ public class JwtFilter extends AuthenticatingFilter {
     @Autowired
     private ObjectMapper objectMapper;
 
+    /**
+     * 生成我们自定义支持的JwtToken
+     * @param servletRequest
+     * @param servletResponse
+     * @return
+     * @throws Exception
+     */
     @Override
     protected AuthenticationToken createToken(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         String jwt = request.getHeader("Authorization");
+        // 当请求头的token为空,，返回空否则生成jwt
         if (StringUtils.isEmpty(jwt)){
             return null;
         }
 
-
         return new JwtToken(jwt);
     }
 
+    /**
+     * 拦截校验，当头部没有Authorization时候，直接通过，不需要自动登录；当带有的时候，校验jwt的有效性，没问题就直接执行executeLogin方法实现自动登录
+     * @param servletRequest
+     * @param servletResponse
+     * @return
+     * @throws Exception
+     */
     @Override
     protected boolean onAccessDenied(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         String jwt = request.getHeader("Authorization");
+        // 当请求头的token为空，放行去Controller校验接口权限
         if (StringUtils.isEmpty(jwt)){
             return true;
         }else {
@@ -56,7 +70,7 @@ public class JwtFilter extends AuthenticatingFilter {
                 throw new ExpiredCredentialsException("token已失效，请重新登录");
             }
 
-            //登录处理
+            // 执行登录 去到 AccountRealm作身份校验
             return executeLogin(servletRequest,servletResponse);
         }
     }

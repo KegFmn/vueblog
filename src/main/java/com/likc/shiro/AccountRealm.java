@@ -26,11 +26,6 @@ public class AccountRealm extends AuthorizingRealm {
     }
 
     @Override
-    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-        return null;
-    }
-
-    @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 
         JwtToken jwtToken = (JwtToken)token;
@@ -50,6 +45,18 @@ public class AccountRealm extends AuthorizingRealm {
         AccountProfile profile = new AccountProfile();
         BeanUtils.copyProperties(user,profile);
 
-        return new SimpleAuthenticationInfo(profile,jwtToken.getCredentials(),getName());
+        //profile消息体、getCredentials获取密钥、getName()其实就是这个自定义类的名字，校验成功后放行到Controller校验权限
+        return new SimpleAuthenticationInfo(profile, jwtToken.getCredentials(), getName());
+    }
+
+    /**
+     * 授权
+     * 只有当需要检测用户权限的时候才会调用此方法，例如checkRole,checkPermission之类的
+     * @param principalCollection
+     * @return
+     */
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
+        return null;
     }
 }

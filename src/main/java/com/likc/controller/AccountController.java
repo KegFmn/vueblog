@@ -46,8 +46,6 @@ public class AccountController {
 
         UserVo userVo = mapStructConverter.userEntity2Vo(user);
 
-        //BeanUtils.copyProperties(user, userVo);
-
         return new Result<>(200, "登录成功", userVo);
     }
 

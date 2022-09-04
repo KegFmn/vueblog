@@ -33,12 +33,7 @@ public class ShiroConfig {
     @Bean
     public SessionManager sessionManager(RedisSessionDAO redisSessionDAO) {
         DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
-
-        // inject redisSessionDAO
         sessionManager.setSessionDAO(redisSessionDAO);
-
-        // other stuff...
-
         return sessionManager;
     }
 
@@ -52,21 +47,18 @@ public class ShiroConfig {
         //inject sessionManager
         securityManager.setSessionManager(sessionManager);
 
-        // 设置自定义用户ID
+        // redis中针对不同用户缓存(此处的id需要对应user实体中的id字段,用于唯一标识)
         redisCacheManager.setPrincipalIdFieldName("id");
         // inject redisCacheManager
         securityManager.setCacheManager(redisCacheManager);
         /*
-         * 关闭shiro自带的session，详情见文档
+         * 关闭shiro自带的session，完全使用jwt校验
          */
         DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
         DefaultSessionStorageEvaluator defaultSessionStorageEvaluator = new DefaultSessionStorageEvaluator();
         defaultSessionStorageEvaluator.setSessionStorageEnabled(false);
         subjectDAO.setSessionStorageEvaluator(defaultSessionStorageEvaluator);
         securityManager.setSubjectDAO(subjectDAO);
-
-        // other stuff...
-
         return securityManager;
     }
 

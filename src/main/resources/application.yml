@@ -8,10 +8,10 @@ spring:
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**Mapper.xml
 
-markerhub:
+vueblog:
   jwt:
     #加密密钥
     secret: f4e2e52034348f86b67cde581c0f9eb5
-    #token有效期，7天，单位秒
-    expire: 604800
+    #token有效期，1天，单位秒
+    expire: 86400
     header: Authorization
