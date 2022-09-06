@@ -10,12 +10,14 @@ import com.likc.util.JwtUtils;
 import com.likc.vo.UserVo;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.ExpiredCredentialsException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -55,6 +57,11 @@ public class AccountController {
 
         SecurityUtils.getSubject().logout();
         return new Result<>(200, "退出成功");
+    }
+
+    @RequestMapping("/expired")
+    public void expired(HttpServletRequest request) {
+        throw new ExpiredCredentialsException((String) request.getAttribute("exception"));
     }
 
 }

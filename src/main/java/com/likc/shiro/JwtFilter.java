@@ -59,6 +59,7 @@ public class JwtFilter extends AuthenticatingFilter {
     protected boolean onAccessDenied(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
+        HttpServletResponse response = (HttpServletResponse)servletResponse;
         String jwt = request.getHeader("Authorization");
         // 当请求头的token为空，放行去Controller校验接口权限
         if (StringUtils.isEmpty(jwt)){
@@ -67,7 +68,9 @@ public class JwtFilter extends AuthenticatingFilter {
             //校验token
             Claims claim = jwtUtils.getClaimByToken(jwt);
             if (claim == null || jwtUtils.isTokenExpired(claim.getExpiration())){
-                throw new ExpiredCredentialsException("token已失效，请重新登录");
+                request.setAttribute("exception", "token已失效，请重新登录");
+                request.getRequestDispatcher("/expired").forward(request, response);
+                return false;
             }
 
             // 执行登录 去到 AccountRealm作身份校验
