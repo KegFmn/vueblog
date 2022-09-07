@@ -40,7 +40,7 @@ public class JwtUtils {
      */
     public String createJwt(HashMap<String, String> payloadClaims) {
         long currentTimeMillis = System.currentTimeMillis();
-        Date expireTime = new Date(System.currentTimeMillis() + expire * 1000 * 60);
+        Date expireTime = new Date(System.currentTimeMillis() + expire * 1000);
         return JWT.create()
                 .withPayload(payloadClaims)
                 .withExpiresAt(expireTime)
