@@ -10,7 +10,13 @@ services:
     volumes: # 挂载
       - /root/nginx/html:/usr/share/nginx/html
       - /root/nginx/cert:/etc/nginx/cert
+      - /root/nginx/logs:/var/log/nginx
       - /root/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - /root/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - /root/nginx/dhparam.pem:/etc/nginx/dhparam.pem
+      - /root/nginx/sites-enabled:/etc/nginx/sites-enabled
+      - /root/nginx/sites-available:/etc/nginx/sites-available
+      - /root/nginx/nginxconfig.io:/etc/nginx/nginxconfig.io
     privileged: true # 这个必须要，解决nginx的文件调用的权限问题
     restart: always
 
@@ -46,7 +52,7 @@ services:
       - "9200:9200"
       - "9300:9300"
     environment:
-      - "ES_JAVA_OPTS=-Xms256m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx1024m"
       - discovery.type=single-node
     privileged: true
     restart: always
@@ -57,15 +63,11 @@ services:
     volumes:
       - /usr/local/docker/canal-server/logs:/admin/canal-server/logs/
       - /usr/local/docker/canal-server/config/startup.sh:/home/admin/canal-server/bin/startup.sh
+      - /usr/local/docker/canal-server/config/instance.properties:/home/admin/canal-server/conf/example/instance.properties
     ports:
       - "11111:11111"
     environment:
-      - canal.instance.mysql.slaveId=2
-      - canal.instance.master.address=vueblog-mysql:3306
-      # mysql 复制账号
-      - canal.instance.dbUsername=root
-      - canal.instance.dbPassword=root
-      - "ES_JAVA_OPTS=-Xms512m -Xmx1024m"
+      - "JAVA_OPTS=-Xms512m -Xmx1024m"
     restart: always
 
   canal-adapter:
@@ -78,7 +80,7 @@ services:
     ports:
       - "8082:8082"
     environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx1024m"
+      - "JAVA_OPTS=-Xms512m -Xmx1024m"
     restart: always
 
   vueblog:
