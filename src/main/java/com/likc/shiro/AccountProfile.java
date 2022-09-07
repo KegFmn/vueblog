@@ -4,6 +4,11 @@ import lombok.Data;
 
 import java.io.Serializable;
 
+/**
+ * @Author: likc
+ * @Date: 2022/09/07/21:46
+ * @Description:
+ */
 @Data
 public class AccountProfile implements Serializable {
 

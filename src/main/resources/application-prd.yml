@@ -26,8 +26,3 @@ spring:
     username:
     password:
 
-shiro-redis:
-  enable: true
-  redis-manager:
-    host: redis:6379 # 容器部署所以可以直接用redis获取ip
-

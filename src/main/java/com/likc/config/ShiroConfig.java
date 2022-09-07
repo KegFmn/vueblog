@@ -6,14 +6,10 @@ import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
 import org.apache.shiro.spring.web.config.ShiroFilterChainDefinition;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
-import org.crazycake.shiro.RedisCacheManager;
-import org.crazycake.shiro.RedisSessionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,26 +27,11 @@ public class ShiroConfig {
     private JwtFilter jwtFilter;
 
     @Bean
-    public SessionManager sessionManager(RedisSessionDAO redisSessionDAO) {
-        DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
-        sessionManager.setSessionDAO(redisSessionDAO);
-        return sessionManager;
-    }
+    public SessionsSecurityManager securityManager(AccountRealm accountRealm) {
 
-    @Bean
-    public SessionsSecurityManager securityManager(AccountRealm accountRealm,
-                                                   SessionManager sessionManager,
-                                                   RedisCacheManager redisCacheManager) {
-
-        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager(accountRealm);
-
-        //inject sessionManager
-        securityManager.setSessionManager(sessionManager);
-
-        // redis中针对不同用户缓存(此处的id需要对应user实体中的id字段,用于唯一标识)
-        redisCacheManager.setPrincipalIdFieldName("id");
-        // inject redisCacheManager
-        securityManager.setCacheManager(redisCacheManager);
+        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
+        // 设置校验ram
+        securityManager.setRealm(accountRealm);
         /*
          * 关闭shiro自带的session，完全使用jwt校验
          */

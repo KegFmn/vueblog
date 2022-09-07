@@ -23,9 +23,4 @@ spring:
     username:
     password:
 
-shiro-redis:
-  enable: true
-  redis-manager:
-    host: 127.0.0.1:6379
-
 

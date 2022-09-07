@@ -11,6 +11,7 @@ import com.likc.vo.UserVo;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.ExpiredCredentialsException;
+import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 
 @RestController
 public class AccountController {
@@ -41,8 +43,9 @@ public class AccountController {
         if (!user.getPassWord().equals(DigestUtils.md5Hex(loginDto.getPassWord()))){
             return new Result<>(400, "密码不正确");
         }
-
-        String jwt = jwtUtils.generateToken(user.getId());
+        HashMap<String, String> payload = new HashMap<>(16);
+        payload.put("id", user.getId().toString());
+        String jwt = jwtUtils.createJwt(payload);
         response.setHeader("Authorization", jwt);
         response.setHeader("Access-Control-Expose-Headers", "Authorization");
 
@@ -59,9 +62,17 @@ public class AccountController {
         return new Result<>(200, "退出成功");
     }
 
-    @RequestMapping("/expired")
+    @RequestMapping("/shiro")
     public void expired(HttpServletRequest request) {
-        throw new ExpiredCredentialsException((String) request.getAttribute("exception"));
+        Object expired = request.getAttribute("expired");
+        if (expired != null) {
+            throw new ExpiredCredentialsException((String) expired);
+        }
+
+        Object unsupport = request.getAttribute("unsupport");
+        if (unsupport != null) {
+            throw new UnsupportedTokenException((String) unsupport);
+        }
     }
 
 }

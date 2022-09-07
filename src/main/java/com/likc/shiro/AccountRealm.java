@@ -30,7 +30,7 @@ public class AccountRealm extends AuthorizingRealm {
 
         JwtToken jwtToken = (JwtToken)token;
 
-        String userId = jwtUtils.getClaimByToken((String) jwtToken.getPrincipal()).getSubject();
+        String userId = jwtUtils.verify((String) jwtToken.getPrincipal()).getClaim("id").asString();
 
         User user = userService.getById(Long.parseLong(userId));
 
@@ -45,7 +45,7 @@ public class AccountRealm extends AuthorizingRealm {
         AccountProfile profile = new AccountProfile();
         BeanUtils.copyProperties(user,profile);
 
-        //profile消息体、getCredentials获取密钥、getName()其实就是这个自定义类的名字，校验成功后放行到Controller校验权限
+        //profile消息体、getCredentials获取密钥、getName()其实就是这个自定义类的名字，校验成功后放行到Controller
         return new SimpleAuthenticationInfo(profile, jwtToken.getCredentials(), getName());
     }
 
