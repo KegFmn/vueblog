@@ -64,11 +64,6 @@ public class AccountController {
 
     @RequestMapping("/shiro")
     public void expired(HttpServletRequest request) {
-        Object expired = request.getAttribute("expired");
-        if (expired != null) {
-            throw new ExpiredCredentialsException((String) expired);
-        }
-
         Object unsupport = request.getAttribute("unsupport");
         if (unsupport != null) {
             throw new UnsupportedTokenException((String) unsupport);
