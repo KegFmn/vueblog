@@ -48,14 +48,7 @@ public class JwtFilter extends AuthenticatingFilter {
             //校验token
             DecodedJWT decodedJWT = jwtUtils.verify(jwt);
             if (decodedJWT == null){
-                request.setAttribute("unsupport", "验证token异常");
-                request.getRequestDispatcher("/shiro").forward(request, response);
-                return false;
-            }
-
-            Date exp = decodedJWT.getClaim("exp").asDate();
-            if (jwtUtils.isTokenExpired(exp)) {
-                request.setAttribute("expired", "token已失效，请重新登录");
+                request.setAttribute("unsupport", "token校验异常");
                 request.getRequestDispatcher("/shiro").forward(request, response);
                 return false;
             }
