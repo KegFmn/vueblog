@@ -3,6 +3,7 @@ package com.likc.mapstruct;
 import com.likc.entity.Blog;
 import com.likc.entity.Type;
 import com.likc.entity.User;
+import com.likc.vo.BlogLikeVo;
 import com.likc.vo.BlogSimpleVo;
 import com.likc.vo.TypeVo;
 import com.likc.vo.UserVo;
@@ -24,4 +25,6 @@ public interface  MapStructConverter {
     UserVo userEntity2Vo(User user);
 
     TypeVo typeEntity2Vo(Type type);
+
+    BlogLikeVo blogEntity2vo(Blog blog);
 }

@@ -4,13 +4,16 @@
 
     <resultMap id="blogResultMap" type="com.likc.vo.BlogDetailsVo">
         <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="typeId" column="type_id"/>
+        <result property="typeName" column="type_name"/>
         <result property="title" column="title"/>
+        <result property="description" column="description"/>
         <result property="content" column="content"/>
+        <result property="likeNumber" column="like_number"/>
         <result property="updated" column="updated"/>
         <result property="original" column="original"/>
-        <result property="userId" column="user_id"/>
-        <result property="typeName" column="type_name"/>
-        <result property="userName" column="user_name"/>
     </resultMap>
     
     <select id="selectBlog" parameterType="long" resultMap="blogResultMap">

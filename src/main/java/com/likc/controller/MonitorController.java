@@ -26,7 +26,6 @@ public class MonitorController {
     @GetMapping("/monitor")
     public Result<Monitor> getMonitor() {
         Monitor monitor = new Monitor();
-
         monitor.setVisitTotal(Long.valueOf(redisUtils.get("visitTotal").toString()));
         monitor.setBlessTotal(Long.valueOf(redisUtils.get("blessTotal").toString()));
         monitor.setBlogTotal(Long.valueOf(redisUtils.get("blogTotal").toString()));

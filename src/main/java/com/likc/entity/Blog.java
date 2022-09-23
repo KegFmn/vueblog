@@ -37,6 +37,8 @@ public class Blog implements Serializable {
     @NotBlank(message = "内容不能为空")
     private String content;
 
+    private Integer likeNumber;
+
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime created;
 

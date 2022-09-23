@@ -60,7 +60,12 @@ public class ListenHandler {
 
         QueryWrapper<Blog> blogQueryWrapper = new QueryWrapper<>();
         Integer blogCount = blogService.count(blogQueryWrapper);
-        
+
+        //QueryWrapper<Blog> ew = new QueryWrapper<>();
+        //ew.select("IFNULL(sum(like_number),0) AS likeNum");
+        //Map<String, Object> blogMap = blogService.getMap(ew);
+        //String likeCount = String.valueOf(blogMap.get("likeNum"));
+
         RestTemplate restTemplate = new RestTemplate();
         StringBuilder builder = new StringBuilder("https://api.github.com");
         builder.append("/repos/KegFmn/vueblog-vuetify/issues/2");
