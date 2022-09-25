@@ -14,12 +14,6 @@ import javax.validation.constraints.NotNull;
 public class LikeDto {
 
     /**
-     * 用户标识
-     */
-    @NotNull(message = "用户标识不能为空")
-    private String userId;
-
-    /**
      * 博客ID
      */
     @NotNull(message = "博客ID不能为空")

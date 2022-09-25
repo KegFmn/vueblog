@@ -13,10 +13,7 @@ import com.likc.service.LikeService;
 import com.likc.util.RedisUtils;
 import com.likc.vo.BlogLikeVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.locks.ReentrantLock;
@@ -47,14 +44,14 @@ public class LikeController {
     private static final String MAP_USER_LIKED = "MAP_USER_LIKED";
 
     @PostMapping("clickLike")
-    public Result<BlogLikeVo> giveLike(@RequestBody LikeDto likeDto) {
-        String key = likeDto.getUserId() + "::" + likeDto.getBlogId();
+    public Result<BlogLikeVo> giveLike(@RequestBody LikeDto likeDto, @RequestHeader("fingerprint") String fingerprint) {
+        String key = fingerprint + "::" + likeDto.getBlogId();
         ReentrantLock lock = new ReentrantLock();
         lock.lock();
         try {
             Object value = redisUtils.hget(MAP_USER_LIKED, key);
             if (likeDto.getType().equals(value)) {
-                return new Result<>(400, "点那么快干嘛？");
+                return new Result<>(400, "点赞的姿势不对哦");
             } else {
                 redisUtils.hset(MAP_USER_LIKED, key, likeDto.getType(), 86400);
             }
@@ -63,7 +60,7 @@ public class LikeController {
         }
 
         Like like = new Like();
-        like.setUserId(likeDto.getUserId())
+        like.setUserId(fingerprint)
                 .setBlogId(likeDto.getBlogId())
                 .setType(likeDto.getType())
                 .setCreated(LocalDateTime.now())
