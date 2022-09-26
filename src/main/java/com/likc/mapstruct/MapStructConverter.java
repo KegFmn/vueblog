@@ -26,5 +26,4 @@ public interface  MapStructConverter {
 
     TypeVo typeEntity2Vo(Type type);
 
-    BlogLikeVo blogEntity2vo(Blog blog);
 }
