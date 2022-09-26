@@ -60,11 +60,13 @@ public class ListenHandler {
 
         QueryWrapper<Blog> blogQueryWrapper = new QueryWrapper<>();
         int blogCount = blogService.count(blogQueryWrapper);
+        log.info("博客总数:{}", blogCount);
 
         QueryWrapper<Blog> ew = new QueryWrapper<>();
         ew.select("IFNULL(sum(like_number),0) AS likeNum");
         Map<String, Object> blogMap = blogService.getMap(ew);
         String likeCount = String.valueOf(blogMap.get("likeNum"));
+        log.info("点赞总数:{}", likeCount);
 
         RestTemplate restTemplate = new RestTemplate();
         StringBuilder builder = new StringBuilder("https://api.github.com");
@@ -85,7 +87,7 @@ public class ListenHandler {
 
         Monitor monitor;
         if (one != null) {
-            log.info("数据库已有监控数据={}, one.toString()");
+            log.info("数据库已有监控数据={}", one);
             monitor = one;
         } else {
             log.info("数据库没有监控数据");
