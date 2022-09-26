@@ -48,7 +48,7 @@ public class LikeController {
     @PostMapping("clickLike")
     public Result<BlogLikeVo> giveLike(@Validated @RequestBody LikeDto likeDto, @RequestHeader("fingerprint") String fingerprint) {
         if (StringUtils.isEmpty(fingerprint)){
-            return new Result<>(400, "请刷新再使用哦");
+            return new Result<>(400, "请刷新后再使用哦");
         }
         String key = fingerprint + "::" + likeDto.getBlogId();
         ReentrantLock lock = new ReentrantLock();
