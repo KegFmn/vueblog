@@ -3,6 +3,7 @@ package com.likc.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.likc.annotation.AccessLimit;
 import com.likc.common.lang.Result;
 import com.likc.dto.LikeDto;
 import com.likc.entity.Blog;
@@ -45,11 +46,9 @@ public class LikeController {
 
     private static final String MAP_USER_LIKED = "MAP_USER_LIKED";
 
+    @AccessLimit(seconds = 8, maxCount = 5, needFingerprint = true)
     @PostMapping("clickLike")
     public Result<BlogLikeVo> giveLike(@Validated @RequestBody LikeDto likeDto, @RequestHeader("fingerprint") String fingerprint) {
-        if (StringUtils.isEmpty(fingerprint)){
-            return new Result<>(400, "请刷新后再使用哦");
-        }
         String key = fingerprint + "::" + likeDto.getBlogId();
         ReentrantLock lock = new ReentrantLock();
         lock.lock();
