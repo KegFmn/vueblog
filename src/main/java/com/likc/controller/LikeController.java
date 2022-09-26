@@ -48,7 +48,7 @@ public class LikeController {
 
     @AccessLimit(seconds = 8, maxCount = 5, needFingerprint = true)
     @PostMapping("clickLike")
-    public Result<BlogLikeVo> giveLike(@Validated @RequestBody LikeDto likeDto, @RequestHeader("fingerprint") String fingerprint) {
+    public Result<Integer> giveLike(@Validated @RequestBody LikeDto likeDto, @RequestHeader("fingerprint") String fingerprint) {
         String key = fingerprint + "::" + likeDto.getBlogId();
         ReentrantLock lock = new ReentrantLock();
         lock.lock();
@@ -92,12 +92,6 @@ public class LikeController {
             redisUtils.decr("likeTotal", 1);
         }
 
-        QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", likeDto.getBlogId());
-        Blog blog = blogService.getOne(queryWrapper);
-        BlogLikeVo blogLikeVo = mapStructConverter.blogEntity2vo(blog);
-        blogLikeVo.setType(likeDto.getType());
-
-        return new Result<>(200, msg, blogLikeVo);
+        return new Result<>(200, msg, likeDto.getType());
     }
 }
