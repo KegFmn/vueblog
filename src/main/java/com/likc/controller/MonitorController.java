@@ -29,6 +29,7 @@ public class MonitorController {
         monitor.setVisitTotal(Long.valueOf(redisUtils.get("visitTotal").toString()));
         monitor.setBlessTotal(Long.valueOf(redisUtils.get("blessTotal").toString()));
         monitor.setBlogTotal(Long.valueOf(redisUtils.get("blogTotal").toString()));
+        monitor.setBlogTotal(Long.valueOf(redisUtils.get("likeTotal").toString()));
 
         return new Result<>(200, "请求成功", monitor);
     }

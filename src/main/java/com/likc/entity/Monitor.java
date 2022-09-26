@@ -45,6 +45,11 @@ public class Monitor implements Serializable {
     private Long blogTotal;
 
     /**
+     * 点赞总数
+     */
+    private Long likeTotal;
+
+    /**
      * 状态
      */
     @TableLogic

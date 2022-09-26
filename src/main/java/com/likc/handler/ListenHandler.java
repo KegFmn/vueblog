@@ -54,17 +54,17 @@ public class ListenHandler {
     public void init() {
         log.info("监控数据初始化");
 
-        redisUtils.del("visitTotal","blessTotal","blogTotal");
+        redisUtils.del("visitTotal","blessTotal","blogTotal","likeTotal");
 
         Monitor one = monitorService.getOne(new QueryWrapper<>(), false);
 
         QueryWrapper<Blog> blogQueryWrapper = new QueryWrapper<>();
-        Integer blogCount = blogService.count(blogQueryWrapper);
+        int blogCount = blogService.count(blogQueryWrapper);
 
-        //QueryWrapper<Blog> ew = new QueryWrapper<>();
-        //ew.select("IFNULL(sum(like_number),0) AS likeNum");
-        //Map<String, Object> blogMap = blogService.getMap(ew);
-        //String likeCount = String.valueOf(blogMap.get("likeNum"));
+        QueryWrapper<Blog> ew = new QueryWrapper<>();
+        ew.select("IFNULL(sum(like_number),0) AS likeNum");
+        Map<String, Object> blogMap = blogService.getMap(ew);
+        String likeCount = String.valueOf(blogMap.get("likeNum"));
 
         RestTemplate restTemplate = new RestTemplate();
         StringBuilder builder = new StringBuilder("https://api.github.com");
@@ -92,7 +92,8 @@ public class ListenHandler {
             monitor = new Monitor();
             monitor.setVisitTotal(0L);
             monitor.setBlessTotal(blessTotal != null ? blessTotal.longValue() : 0L);
-            monitor.setBlogTotal(blogCount.longValue());
+            monitor.setBlogTotal((long) blogCount);
+            monitor.setLikeTotal(Long.parseLong(likeCount));
             monitor.setStatus(0);
             monitorService.save(monitor);
         }
@@ -102,7 +103,9 @@ public class ListenHandler {
         // 留言总数
         redisUtils.incr("blessTotal", blessTotal == null ? monitor.getBlessTotal() : blessTotal.longValue());
         // 博客总数
-        redisUtils.incr("blogTotal", blogCount.longValue());
+        redisUtils.incr("blogTotal", blogCount);
+        // 博客总数
+        redisUtils.incr("likeTotal", Long.parseLong(likeCount));
 
         log.info("写入redis成功");
 
@@ -118,6 +121,7 @@ public class ListenHandler {
         monitor.setVisitTotal(Long.valueOf(redisUtils.get("visitTotal").toString()));
         monitor.setBlessTotal(Long.valueOf(redisUtils.get("blessTotal").toString()));
         monitor.setBlogTotal(Long.valueOf(redisUtils.get("blogTotal").toString()));
+        monitor.setBlogTotal(Long.valueOf(redisUtils.get("likeTotal").toString()));
 
         QueryWrapper<Monitor> wrapper = new QueryWrapper<>();
         wrapper.eq("status", 0);
@@ -125,8 +129,8 @@ public class ListenHandler {
 
         log.info("缓存数据保存数据库成功");
 
-        redisUtils.del("visitTotal","blessTotal","blogTotal");
+        redisUtils.del("visitTotal","blessTotal","blogTotal","likeTotal");
 
-        log.info("删除缓存visitTotal、blessTotal、blogTotal的Key成功");
+        log.info("删除缓存visitTotal、blessTotal、blogTotal、likeTotal的Key成功");
     }
 }

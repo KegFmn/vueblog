@@ -84,7 +84,14 @@ public class LikeController {
             wrapper.setSql("like_number = like_number - 1");
             msg = "取消点赞";
         }
+
         blogService.update(wrapper);
+
+        if (likeDto.getType() == 0) {
+            redisUtils.incr("likeTotal", 1);
+        } else {
+            redisUtils.decr("likeTotal", 1);
+        }
 
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", likeDto.getBlogId());
