@@ -32,7 +32,6 @@ public class MonitorTask {
 
     @Scheduled(cron = "0 0 0/1 * * ? ")
     public void monitorTask() {
-        Monitor monitor = new Monitor();
 
         RestTemplate restTemplate = new RestTemplate();
         StringBuilder builder = new StringBuilder("https://api.github.com");
@@ -53,16 +52,18 @@ public class MonitorTask {
                 log.info("清除评论缓存");
                 redisUtils.del("blessTotal");
                 redisUtils.incr("blessTotal", blessTotal);
-                log.info("重新设置评论缓存");;
+                log.info("重新设置评论缓存成功");;
             }
         }
 
         log.info("定时同步github评论数量={}", blessTotal);
 
         log.info("定时监控写入数据库开始");
+        Monitor monitor = new Monitor();
         monitor.setVisitTotal(Long.valueOf(redisUtils.get("visitTotal").toString()));
         monitor.setBlessTotal(Long.valueOf(redisUtils.get("blessTotal").toString()));
         monitor.setBlogTotal(Long.valueOf(redisUtils.get("blogTotal").toString()));
+        monitor.setLikeTotal(Long.valueOf(redisUtils.get("likeTotal").toString()));
 
         QueryWrapper<Monitor> wrapper = new QueryWrapper<>();
         wrapper.eq("status", 0);
