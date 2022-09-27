@@ -84,6 +84,7 @@ public class ListenHandler {
         if (map != null) {
             blessTotal = (Integer) map.get("comments");
         }
+        log.info("同步github评论成功，数量={}", blessTotal);
 
         Monitor monitor;
         if (one != null) {
