@@ -3,6 +3,7 @@ package com.likc.common.exception;
 import com.likc.common.lang.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.ShiroException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -46,10 +47,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public Result<Void> handler(MethodArgumentNotValidException e){
         log.error("实体校验异常: ======================={}",e.getMessage());
-        BindingResult bindingResult = e.getBindingResult();
-        ObjectError objectError = bindingResult.getAllErrors().stream().findFirst().get();
+        List<ObjectError> allErrors = e.getBindingResult().getAllErrors();
+        String message = allErrors.stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(";"));
 
-        return new Result<>(400, objectError.getDefaultMessage());
+        return new Result<>(400, message);
     }
 
     /**
@@ -62,6 +63,7 @@ public class GlobalExceptionHandler {
     public Result<Void> handler(ConstraintViolationException e){
         log.error("参数校验异常: ======================={}",e.getMessage());
         List<String> list = e.getConstraintViolations().stream().map(ConstraintViolation::getMessage).collect(Collectors.toList());
+
         return new Result<>(400, list.toString());
     }
 
