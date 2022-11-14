@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.ShiroException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -62,9 +61,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ConstraintViolationException.class)
     public Result<Void> handler(ConstraintViolationException e){
         log.error("参数校验异常: ======================={}",e.getMessage());
-        List<String> list = e.getConstraintViolations().stream().map(ConstraintViolation::getMessage).collect(Collectors.toList());
+        String message = e.getConstraintViolations().stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(";"));
 
-        return new Result<>(400, list.toString());
+        return new Result<>(400, message);
     }
 
 }
