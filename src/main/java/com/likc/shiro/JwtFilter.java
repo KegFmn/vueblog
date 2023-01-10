@@ -48,8 +48,13 @@ public class JwtFilter extends AuthenticatingFilter {
             //校验token
             DecodedJWT decodedJWT = jwtUtils.verify(jwt);
             if (decodedJWT == null){
-                request.setAttribute("unsupport", "token校验异常");
-                request.getRequestDispatcher("/shiro").forward(request, response);
+                Result<Void> result = new Result<>(401, "token校验异常");
+                try {
+                    String json = objectMapper.writeValueAsString(result);
+                    response.getWriter().print(json);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
                 return false;
             }
 

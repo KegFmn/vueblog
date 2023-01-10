@@ -62,12 +62,4 @@ public class AccountController {
         return new Result<>(200, "退出成功");
     }
 
-    @RequestMapping("/shiro")
-    public void expired(HttpServletRequest request) {
-        Object unsupport = request.getAttribute("unsupport");
-        if (unsupport != null) {
-            throw new UnsupportedTokenException((String) unsupport);
-        }
-    }
-
 }
