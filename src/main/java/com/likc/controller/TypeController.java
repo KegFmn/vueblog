@@ -8,11 +8,9 @@ import com.likc.entity.Type;
 import com.likc.mapstruct.MapStructConverter;
 import com.likc.service.BlogService;
 import com.likc.service.TypeService;
-import com.likc.util.RedisUtils;
-import com.likc.util.ShiroUtil;
+import com.likc.util.UserThreadLocal;
 import com.likc.vo.TypeVo;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
@@ -50,7 +48,7 @@ public class TypeController {
         return new Result<>(200, "请求成功", typeVos);
     }
 
-    @RequiresAuthentication
+
     @PostMapping("/type/save")
     public Result<Void> save(@Validated @RequestBody TypeDto typeDto){
 
@@ -65,10 +63,10 @@ public class TypeController {
         if (typeDto.getId() != null){
             temp = typeService.getById(typeDto.getId());
             //只能编辑自己的文章
-            Assert.isTrue(temp.getUserId().longValue() == ShiroUtil.getProfile().getId().longValue(),"没有权限编辑");
+            Assert.isTrue(temp.getUserId().longValue() == UserThreadLocal.get().getId().longValue(),"没有权限编辑");
         }else {
             temp = new Type();
-            temp.setUserId(ShiroUtil.getProfile().getId());
+            temp.setUserId(UserThreadLocal.get().getId());
             temp.setCreated(LocalDateTime.now());
             temp.setStatus(0);
         }
@@ -80,7 +78,7 @@ public class TypeController {
         return new Result<>(200, "保存成功");
     }
 
-    @RequiresAuthentication
+
     @PostMapping("type/delete")
     public Result<Void> delete(@Validated @RequestBody TypeDto typeDto){
         QueryWrapper<Type> typeWrapper = new QueryWrapper<>();

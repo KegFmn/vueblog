@@ -9,10 +9,6 @@ import com.likc.service.UserService;
 import com.likc.util.JwtUtils;
 import com.likc.vo.UserVo;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.ExpiredCredentialsException;
-import org.apache.shiro.authc.pam.UnsupportedTokenException;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
@@ -54,12 +50,10 @@ public class AccountController {
         return new Result<>(200, "登录成功", userVo);
     }
 
-    @RequiresAuthentication
-    @GetMapping("/logout")
-    public Result<Void> logout(){
-
-        SecurityUtils.getSubject().logout();
-        return new Result<>(200, "退出成功");
-    }
+//    @GetMapping("/logout")
+//    public Result<Void> logout(){
+//        SecurityUtils.getSubject().logout();
+//        return new Result<>(200, "退出成功");
+//    }
 
 }

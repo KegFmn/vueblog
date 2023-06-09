@@ -22,7 +22,7 @@
         <org.projectlombok.version>1.18.22</org.projectlombok.version>
         <mybatis.plus.version>3.2.0</mybatis.plus.version>
         <mybatis.plus.generator.version>3.2.0</mybatis.plus.generator.version>
-        <shiro.spring.boot.version>1.9.1</shiro.spring.boot.version>
+<!--        <shiro.spring.boot.version>1.9.1</shiro.spring.boot.version>-->
         <jwt.version>4.0.0</jwt.version>
     </properties>
 
@@ -74,11 +74,11 @@
             <version>${mybatis.plus.generator.version}</version>
         </dependency>
         <!--shrio-redis-->
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-spring-boot-starter</artifactId>
-            <version>${shiro.spring.boot.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.shiro</groupId>-->
+<!--            <artifactId>shiro-spring-boot-starter</artifactId>-->
+<!--            <version>${shiro.spring.boot.version}</version>-->
+<!--        </dependency>-->
         <!-- jwt -->
         <dependency>
             <groupId>com.auth0</groupId>

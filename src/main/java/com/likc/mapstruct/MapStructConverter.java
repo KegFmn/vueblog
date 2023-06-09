@@ -16,9 +16,9 @@ import org.mapstruct.factory.Mappers;
  * @description
  */
 @Mapper(componentModel = "spring")
-public interface  MapStructConverter {
+public interface MapStructConverter {
 
-    MapStructConverter INSTANCE = Mappers.getMapper(MapStructConverter.class);
+//    MapStructConverter INSTANCE = Mappers.getMapper(MapStructConverter.class);
 
     BlogSimpleVo simpleEntity2Vo(Blog blog);
 

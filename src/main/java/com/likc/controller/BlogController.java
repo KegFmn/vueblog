@@ -10,10 +10,9 @@ import com.likc.entity.Blog;
 import com.likc.mapstruct.MapStructConverter;
 import com.likc.service.BlogService;
 import com.likc.util.RedisUtils;
-import com.likc.util.ShiroUtil;
+import com.likc.util.UserThreadLocal;
 import com.likc.vo.BlogDetailsVo;
 import com.likc.vo.BlogSimpleVo;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -45,14 +44,13 @@ public class BlogController {
     @GetMapping("blogs")
     public Result<IPage<BlogSimpleVo>> list(@RequestParam(name = "currentPage", defaultValue = "1") Integer currentPage,
                        @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize,
-                       @RequestParam(name = "typeId", defaultValue = "0") Long typeId ){
+                       @RequestParam(name = "typeId", defaultValue = "0") Long typeId){
 
         Page<Blog> page = new Page<>(currentPage, pageSize);
 
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(typeId != 0, "type_id", typeId)
                 .orderByDesc("updated");
-
 
         IPage<Blog> pageDate = blogService.page(page, queryWrapper);
 
@@ -70,7 +68,7 @@ public class BlogController {
         return new Result<>(200, "请求成功", blogDetailsVo);
     }
 
-    @RequiresAuthentication
+
     @PostMapping("blog/edit")
     public Result<Void> edit(@Validated @RequestBody BlogDto blogDto){
 
@@ -80,11 +78,11 @@ public class BlogController {
             temp = blogService.getById(blogDto.getId());
             temp.setUpdated(LocalDateTime.now());
             //只能编辑自己的文章
-            Assert.isTrue(temp.getUserId().longValue() == ShiroUtil.getProfile().getId().longValue(),"没有权限编辑");
+            Assert.isTrue(temp.getUserId().longValue() == UserThreadLocal.get().getId().longValue(),"没有权限编辑");
             flag = false;
         }else {
             temp = new Blog();
-            temp.setUserId(ShiroUtil.getProfile().getId());
+            temp.setUserId(UserThreadLocal.get().getId());
             temp.setCreated(LocalDateTime.now());
             temp.setUpdated(LocalDateTime.now());
         }
@@ -99,12 +97,11 @@ public class BlogController {
         return new Result<>(200, "保存成功");
     }
 
-    @RequiresAuthentication
     @PostMapping("blog/delete")
     public Result<Void> delete(@RequestBody Blog blog){
 
         Blog temp = blogService.getById(blog.getId());
-        Assert.isTrue(temp.getUserId().longValue() == ShiroUtil.getProfile().getId().longValue(),"没有权限删除");
+        Assert.isTrue(temp.getUserId().longValue() == UserThreadLocal.get().getId().longValue(),"没有权限删除");
         blogService.removeById(temp.getId());
 
         redisUtils.decr("blogTotal", 1);

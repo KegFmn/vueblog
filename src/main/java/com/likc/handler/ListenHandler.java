@@ -1,5 +1,6 @@
 package com.likc.handler;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.likc.entity.Blog;
@@ -20,6 +21,7 @@ import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author likc
@@ -56,10 +58,9 @@ public class ListenHandler {
 
         redisUtils.del("visitTotal","blessTotal","blogTotal","likeTotal");
 
-        Monitor one = monitorService.getOne(new QueryWrapper<>(), false);
+        Monitor one = monitorService.lambdaQuery().one();
 
-        QueryWrapper<Blog> blogQueryWrapper = new QueryWrapper<>();
-        int blogCount = blogService.count(blogQueryWrapper);
+        int blogCount = blogService.lambdaQuery().count();
         log.info("博客总数:{}", blogCount);
 
         QueryWrapper<Blog> ew = new QueryWrapper<>();
@@ -74,20 +75,20 @@ public class ListenHandler {
         Map<String, Object> map = null;
         try {
             String object = restTemplate.getForObject(builder.toString(), String.class);
-            if (object != null) {
+            if (Objects.nonNull(object)) {
                 map = objectMapper.readValue(object, Map.class);
             }
         } catch (Exception e) {
             log.error("同步github评论失败，异常={}", e.getMessage());
         }
         Integer blessTotal = null;
-        if (map != null) {
+        if (Objects.nonNull(map)) {
             blessTotal = (Integer) map.get("comments");
         }
         log.info("同步github评论成功，数量={}", blessTotal);
 
         Monitor monitor;
-        if (one != null) {
+        if (Objects.nonNull(one)) {
             log.info("数据库已有监控数据={}", one);
             monitor = one;
         } else {
@@ -117,23 +118,15 @@ public class ListenHandler {
     @PreDestroy
     public void destroy(){
         log.info("系统关闭前");
-
         //将Redis中的数据取出写入数据库
         Monitor monitor = new Monitor();
-
         monitor.setVisitTotal(Long.valueOf(redisUtils.get("visitTotal").toString()));
         monitor.setBlessTotal(Long.valueOf(redisUtils.get("blessTotal").toString()));
         monitor.setBlogTotal(Long.valueOf(redisUtils.get("blogTotal").toString()));
         monitor.setBlogTotal(Long.valueOf(redisUtils.get("likeTotal").toString()));
-
-        QueryWrapper<Monitor> wrapper = new QueryWrapper<>();
-        wrapper.eq("status", 0);
-        monitorService.update(monitor, wrapper);
-
+        monitorService.update(monitor, new LambdaQueryWrapper<Monitor>().eq(Monitor::getStatus, 0));
         log.info("缓存数据保存数据库成功");
-
         redisUtils.del("visitTotal","blessTotal","blogTotal","likeTotal");
-
         log.info("删除缓存visitTotal、blessTotal、blogTotal、likeTotal的Key成功");
     }
 }

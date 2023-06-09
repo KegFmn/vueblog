@@ -1,5 +1,6 @@
 package com.likc.task;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.likc.entity.Monitor;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author likc
@@ -30,7 +32,7 @@ public class MonitorTask {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Scheduled(cron = "0 0 0/1 * * ? ")
+    @Scheduled(cron = "0 0 0/1 * * ?")
     public void monitorTask() {
 
         RestTemplate restTemplate = new RestTemplate();
@@ -46,7 +48,7 @@ public class MonitorTask {
             log.error("定时同步github评论失败，异常={}", e.getMessage());
         }
         Integer blessTotal = null;
-        if (map != null) {
+        if (Objects.nonNull(map)) {
             blessTotal = (Integer) map.get("comments");
             if (blessTotal != null) {
                 log.info("清除评论缓存");
@@ -65,9 +67,7 @@ public class MonitorTask {
         monitor.setBlogTotal(Long.valueOf(redisUtils.get("blogTotal").toString()));
         monitor.setLikeTotal(Long.valueOf(redisUtils.get("likeTotal").toString()));
 
-        QueryWrapper<Monitor> wrapper = new QueryWrapper<>();
-        wrapper.eq("status", 0);
-        monitorService.update(monitor, wrapper);
+        monitorService.update(monitor, new LambdaQueryWrapper<Monitor>().eq(Monitor::getStatus, 0));
 
         log.info("定时监控写入数据库成功");
     }
