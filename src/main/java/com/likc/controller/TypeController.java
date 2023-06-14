@@ -8,6 +8,7 @@ import com.likc.entity.Type;
 import com.likc.mapstruct.MapStructConverter;
 import com.likc.service.BlogService;
 import com.likc.service.TypeService;
+import com.likc.util.RedisUtils;
 import com.likc.util.UserThreadLocal;
 import com.likc.vo.TypeVo;
 import lombok.extern.slf4j.Slf4j;
@@ -33,12 +34,15 @@ public class TypeController {
     @Autowired
     private MapStructConverter mapStructConverter;
 
+    @Autowired
+    private RedisUtils redisUtils;
 
     @GetMapping("/types")
     public Result<List<TypeVo>> list(){
+        redisUtils.incr("visitTotal",1);
+
         QueryWrapper<Type> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("status",0)
-                .select("id","type_name")
+        queryWrapper.select("id","type_name")
                 .orderByDesc("created");
 
         List<Type> list = typeService.list(queryWrapper);

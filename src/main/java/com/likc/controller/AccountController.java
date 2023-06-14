@@ -50,10 +50,4 @@ public class AccountController {
         return new Result<>(200, "登录成功", userVo);
     }
 
-//    @GetMapping("/logout")
-//    public Result<Void> logout(){
-//        SecurityUtils.getSubject().logout();
-//        return new Result<>(200, "退出成功");
-//    }
-
 }

@@ -25,4 +25,10 @@ spring:
     uris: elasticsearch:9200
     username:
     password:
+  rabbitmq:
+    username: root
+    password: root
+    virtual-host: /
+    host: rabbitmq
+    port: 5672
 

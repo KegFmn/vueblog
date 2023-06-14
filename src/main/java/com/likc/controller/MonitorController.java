@@ -34,13 +34,11 @@ public class MonitorController {
         return new Result<>(200, "请求成功", monitor);
     }
 
-    @GetMapping("/monitor/addVisitTotal")
-    public Result<Void> addVisitTotal() {
-
-        redisUtils.incr("visitTotal",1);
-
-        return new Result<>(200, "请求成功");
-    }
-
-
+//    @GetMapping("/monitor/addVisitTotal")
+//    public Result<Void> addVisitTotal() {
+//
+//        redisUtils.incr("visitTotal",1);
+//
+//        return new Result<>(200, "请求成功");
+//    }
 }

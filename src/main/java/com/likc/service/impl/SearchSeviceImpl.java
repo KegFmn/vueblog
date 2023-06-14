@@ -43,7 +43,7 @@ public class SearchSeviceImpl extends ServiceImpl<SearchMapper, CollectDoc> impl
 
         SearchHits<CollectDoc> searchHits = elasticsearchRestTemplate.search(criteriaQuery, CollectDoc.class);
 
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         List<SearchBlogVo> collectDocs = searchHits.get().map(e ->{
             SearchBlogVo searchBlogVo = new SearchBlogVo();
