@@ -30,5 +30,14 @@ spring:
     virtual-host: /
     host: 192.168.31.30
     port: 5672
+    listener:
+      simple:
+        acknowledge-mode: manual #开启手动确认
+        retry:
+          enabled: true
+          max-attempts: 3 #重试次数
+          initial-interval: 5000  #重试间隔时间（单位毫秒）
+          max-interval: 10000   #重试最大时间间隔（单位毫秒）
+
 
 
