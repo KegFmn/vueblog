@@ -98,7 +98,6 @@ public class BlogController {
 
         if (flag) {
             redisUtils.incr("blogTotal", 1);
-            temp.setId(null);
         }
 
         rabbitTemplate.convertAndSend("topicExchange", "blog.save", temp);

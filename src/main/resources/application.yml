@@ -1,9 +1,12 @@
 spring:
   profiles:
-    active: prd
+    active: dev
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher # springboot升级2.6.0导致的
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
 
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**Mapper.xml

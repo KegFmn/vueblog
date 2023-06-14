@@ -6,6 +6,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 @SpringBootTest
@@ -17,7 +18,13 @@ public class RabbitmqTest {
     @Test
     public void message() {
         Blog blog = new Blog();
-        blog.setId(1L);
+        blog.setId(100L);
+        blog.setContent("测试");
+        blog.setDescription("测试");
+        blog.setOriginal(0);
+        blog.setTitle("测试");
+        blog.setTypeId(25L);
+        blog.setUpdated(LocalDateTime.now());
 //        HashMap<String, String> save = new HashMap<>();
 //        save.put("save","save");
         rabbitTemplate.convertAndSend("topicExchange", "blog.save", blog);

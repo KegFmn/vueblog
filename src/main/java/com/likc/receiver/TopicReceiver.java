@@ -50,27 +50,19 @@ public class TopicReceiver {
         String blogString = new String(message.getBody());
         try {
             Blog blog = objectMapper.readValue(blogString, Blog.class);
-            if (Objects.nonNull(blog.getId())) {
-                CollectDoc collectDoc = initDoc(blog);
-                // 排除null
-                ObjectNode docNode = objectMapper.valueToTree(collectDoc);
-                ObjectNode filteredNode = objectMapper.createObjectNode();
-                Iterator<Map.Entry<String, JsonNode>> fields = docNode.fields();
-                while (fields.hasNext()) {
-                    Map.Entry<String, JsonNode> entry = fields.next();
-                    if (!entry.getValue().isNull()) {
-                        filteredNode.set(entry.getKey(), entry.getValue());
-                    }
-                }
-                String filteredDocString = filteredNode.toString();
-                UpdateQuery builder = UpdateQuery
-                            .builder(String.valueOf(collectDoc.getId()))
-                            .withDocument(Document.parse(filteredDocString))
-                            .build();
-                elasticsearchRestTemplate.update(builder, elasticsearchRestTemplate.getIndexCoordinatesFor(CollectDoc.class));
-            } else {
-                CollectDoc collectDoc = initDoc(blog);
+            CollectDoc collectDoc = initDoc(blog);
+            // 排除null
+            ObjectNode filteredNode = excludeNull(collectDoc);
+            String filteredDocString = filteredNode.toString();
+            UpdateQuery builder = UpdateQuery
+                        .builder(String.valueOf(collectDoc.getId()))
+                        .withDocument(Document.parse(filteredDocString))
+                        .build();
+            CollectDoc doc = elasticsearchRestTemplate.get(String.valueOf(collectDoc.getId()), CollectDoc.class);
+            if (Objects.isNull(doc)) {
                 elasticsearchRestTemplate.save(collectDoc);
+            } else {
+                elasticsearchRestTemplate.update(builder, elasticsearchRestTemplate.getIndexCoordinatesFor(CollectDoc.class));
             }
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
@@ -106,4 +98,16 @@ public class TopicReceiver {
         return collectDoc;
     }
 
+    private ObjectNode excludeNull(CollectDoc collectDoc) {
+        ObjectNode docNode = objectMapper.valueToTree(collectDoc);
+        ObjectNode filteredNode = objectMapper.createObjectNode();
+        Iterator<Map.Entry<String, JsonNode>> fields = docNode.fields();
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> entry = fields.next();
+            if (!entry.getValue().isNull()) {
+                filteredNode.set(entry.getKey(), entry.getValue());
+            }
+        }
+        return filteredNode;
+    }
 }
