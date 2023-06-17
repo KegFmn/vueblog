@@ -50,21 +50,21 @@ public class ESTest {
 
     @Test
     public void process() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        Blog blog = blogService.lambdaQuery().orderByDesc(Blog::getId).last("limit 1").one();
+//        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        Blog blog = blogService.lambdaQuery().orderByDesc(Blog::getId).last("limit 1").one();
 //        for (Blog blog : list) {
-            CollectDoc collectDoc = new CollectDoc();
-            collectDoc.setId(blog.getId());
-            if (Objects.nonNull(blog.getTypeId())) {
-                Type type = typeService.lambdaQuery().eq(Type::getId, blog.getTypeId()).one();
-                collectDoc.setTypeId(type.getId());
-                collectDoc.setTypeName(type.getTypeName());
-            }
-            collectDoc.setDescription(blog.getDescription());
-            collectDoc.setTitle(blog.getTitle());
-            collectDoc.setContent(blog.getContent());
-            collectDoc.setUpdated(dateTimeFormatter.format(blog.getUpdated()));
-            elasticsearchRestTemplate.save(collectDoc);
+//            CollectDoc collectDoc = new CollectDoc();
+//            collectDoc.setId(blog.getId());
+//            if (Objects.nonNull(blog.getTypeId())) {
+//                Type type = typeService.lambdaQuery().eq(Type::getId, blog.getTypeId()).one();
+//                collectDoc.setTypeId(type.getId());
+//                collectDoc.setTypeName(type.getTypeName());
+//            }
+//            collectDoc.setDescription(blog.getDescription());
+//            collectDoc.setTitle(blog.getTitle());
+//            collectDoc.setContent(blog.getContent());
+//            collectDoc.setUpdated(dateTimeFormatter.format(blog.getUpdated()));
+//            elasticsearchRestTemplate.save(collectDoc);
 //        }
 //        CollectDoc doc = elasticsearchRestTemplate.save(String.valueOf(blog.getId()), CollectDoc.class);
 //
@@ -95,6 +95,8 @@ public class ESTest {
 //                .withDocument(Document.parse(filteredDocString))
 //                .build();
 //        elasticsearchRestTemplate.update(builder, elasticsearchRestTemplate.getIndexCoordinatesFor(CollectDoc.class));
+
+//        elasticsearchRestTemplate.delete(String.valueOf(100), CollectDoc.class);
     }
 
     private Pageable getPage(Integer currentPage, Integer pageSize) {
