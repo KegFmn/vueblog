@@ -36,7 +36,7 @@ mvnw
 ### VS Code ###
 .vscode/
 
-/src/main/resources
+/src/main/resources/application.yml
 
 ##               表示此为注释,将被Git忽略
 #*.a             表示忽略所有 .a 结尾的文件
