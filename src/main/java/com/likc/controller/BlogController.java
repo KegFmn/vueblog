@@ -97,12 +97,13 @@ public class BlogController {
         BeanUtils.copyProperties(blogDto, temp, "id","userId","created");
         blogService.saveOrUpdate(temp);
 
+        BlogMqDTO blogMqDTO = new BlogMqDTO();
         if (flag) {
             redisUtils.incr("blogTotal", 1);
+            blogMqDTO.setType("save");
+        } else {
+            blogMqDTO.setType("update");
         }
-
-        BlogMqDTO blogMqDTO = new BlogMqDTO();
-        blogMqDTO.setType("edit");
         blogMqDTO.setBlog(temp);
         rabbitTemplate.convertAndSend("topicExchange", "blog", blogMqDTO);
 

@@ -18,16 +18,9 @@ public class RabbitmqTest {
 
     @Test
     public void message() {
-        Blog blog = new Blog();
-        blog.setId(100L);
-        blog.setContent("内容");
-        blog.setOriginal(0);
-        blog.setTitle("标题");
-        blog.setTypeId(25L);
-        blog.setUpdated(LocalDateTime.now());
         BlogMqDTO blogMqDTO = new BlogMqDTO();
         blogMqDTO.setType("delete");
-        blogMqDTO.setBlog(blog);
+        blogMqDTO.setBlog(new Blog().setId(100L));
         rabbitTemplate.convertAndSend("topicExchange", "blog", blogMqDTO);
 
         try {

@@ -27,6 +27,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
@@ -47,32 +48,50 @@ public class TopicReceiver {
     private TypeService typeService;
 
     @RabbitListener(queues = "blog")
-    public void processSave(Message message, Channel channel) {
+    public void processSave(Message message, Channel channel) throws Exception {
         String blogString = new String(message.getBody());
         try {
             BlogMqDTO blogMqDTO = objectMapper.readValue(blogString, BlogMqDTO.class);
             CollectDoc collectDoc = initDoc(blogMqDTO.getBlog());
-            if ("edit".equals(blogMqDTO.getType())) {
-                ObjectNode filteredNode = excludeNull(collectDoc);
-                String filteredDocString = filteredNode.toString();
-                UpdateQuery builder = UpdateQuery
-                        .builder(String.valueOf(collectDoc.getId()))
-                        .withDocument(Document.parse(filteredDocString))
-                        .build();
+            if ("save".equals(blogMqDTO.getType())) {
+                elasticsearchRestTemplate.save(collectDoc);
+            } else if ("update".equals(blogMqDTO.getType())) {
                 CollectDoc doc = elasticsearchRestTemplate.get(String.valueOf(collectDoc.getId()), CollectDoc.class);
                 if (Objects.isNull(doc)) {
-                    elasticsearchRestTemplate.save(collectDoc);
+                    channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
                 } else {
+                    ObjectNode filteredNode = excludeNull(collectDoc);
+                    String filteredDocString = filteredNode.toString();
+                    UpdateQuery builder = UpdateQuery
+                            .builder(String.valueOf(collectDoc.getId()))
+                            .withDocument(Document.parse(filteredDocString))
+                            .build();
                     elasticsearchRestTemplate.update(builder, elasticsearchRestTemplate.getIndexCoordinatesFor(CollectDoc.class));
                 }
             } else {
-                elasticsearchRestTemplate.delete(String.valueOf(collectDoc.getId()), CollectDoc.class);
+                CollectDoc doc = elasticsearchRestTemplate.get(String.valueOf(collectDoc.getId()), CollectDoc.class);
+                if (Objects.isNull(doc)) {
+                    channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
+                } else {
+                    elasticsearchRestTemplate.delete(String.valueOf(collectDoc.getId()), CollectDoc.class);
+                }
             }
+            // 消息确认
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             log.error("消费失败：{}", e.getMessage());
+            throw new Exception(e.getMessage());
         }
     }
+
+//    @RabbitListener(queues = "dead")
+//    public void processDead(Message message, Channel channel) {
+//        try {
+//            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+//        } catch (IOException e) {
+//            log.error("消费失败：{}", e.getMessage());
+//        }
+//    }
 
     private CollectDoc initDoc(Blog blog) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -86,7 +105,9 @@ public class TopicReceiver {
         collectDoc.setDescription(blog.getDescription());
         collectDoc.setTitle(blog.getTitle());
         collectDoc.setContent(blog.getContent());
-        collectDoc.setUpdated(dateTimeFormatter.format(blog.getUpdated()));
+        if (Objects.nonNull(blog.getUpdated())) {
+            collectDoc.setUpdated(dateTimeFormatter.format(blog.getUpdated()));
+        }
         return collectDoc;
     }
 
