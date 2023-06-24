@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.likc.dto.BlogMqDTO;
 import com.likc.entity.Blog;
 import com.likc.entity.Type;
 import com.likc.search.CollectDoc;
@@ -45,40 +46,31 @@ public class TopicReceiver {
     @Resource
     private TypeService typeService;
 
-    @RabbitListener(queues = "blog.save")
+    @RabbitListener(queues = "blog")
     public void processSave(Message message, Channel channel) {
         String blogString = new String(message.getBody());
         try {
-            Blog blog = objectMapper.readValue(blogString, Blog.class);
-            CollectDoc collectDoc = initDoc(blog);
-            // 排除null
-            ObjectNode filteredNode = excludeNull(collectDoc);
-            String filteredDocString = filteredNode.toString();
-            UpdateQuery builder = UpdateQuery
+            BlogMqDTO blogMqDTO = objectMapper.readValue(blogString, BlogMqDTO.class);
+            CollectDoc collectDoc = initDoc(blogMqDTO.getBlog());
+            if ("edit".equals(blogMqDTO.getType())) {
+                ObjectNode filteredNode = excludeNull(collectDoc);
+                String filteredDocString = filteredNode.toString();
+                UpdateQuery builder = UpdateQuery
                         .builder(String.valueOf(collectDoc.getId()))
                         .withDocument(Document.parse(filteredDocString))
                         .build();
-            CollectDoc doc = elasticsearchRestTemplate.get(String.valueOf(collectDoc.getId()), CollectDoc.class);
-            if (Objects.isNull(doc)) {
-                elasticsearchRestTemplate.save(collectDoc);
+                CollectDoc doc = elasticsearchRestTemplate.get(String.valueOf(collectDoc.getId()), CollectDoc.class);
+                if (Objects.isNull(doc)) {
+                    elasticsearchRestTemplate.save(collectDoc);
+                } else {
+                    elasticsearchRestTemplate.update(builder, elasticsearchRestTemplate.getIndexCoordinatesFor(CollectDoc.class));
+                }
             } else {
-                elasticsearchRestTemplate.update(builder, elasticsearchRestTemplate.getIndexCoordinatesFor(CollectDoc.class));
+                elasticsearchRestTemplate.delete(String.valueOf(collectDoc.getId()), CollectDoc.class);
             }
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             log.error("消费失败：{}", e.getMessage());
-        }
-    }
-
-    @RabbitListener(queues = "blog.delete")
-    public void processDelete(Message message, Channel channel) {
-        try {
-            String blogString = new String(message.getBody());
-            Long id = objectMapper.readValue(blogString, Long.class);
-            elasticsearchRestTemplate.delete(String.valueOf(id), CollectDoc.class);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-        } catch (Exception e) {
-            log.error("删除失败：{}", e.getMessage());
         }
     }
 

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.likc.common.lang.Result;
 import com.likc.dto.BlogDto;
+import com.likc.dto.BlogMqDTO;
 import com.likc.entity.Blog;
 import com.likc.mapstruct.MapStructConverter;
 import com.likc.service.BlogService;
@@ -100,7 +101,10 @@ public class BlogController {
             redisUtils.incr("blogTotal", 1);
         }
 
-        rabbitTemplate.convertAndSend("topicExchange", "blog.save", temp);
+        BlogMqDTO blogMqDTO = new BlogMqDTO();
+        blogMqDTO.setType("edit");
+        blogMqDTO.setBlog(temp);
+        rabbitTemplate.convertAndSend("topicExchange", "blog", blogMqDTO);
 
         return new Result<>(200, "保存成功");
     }
@@ -114,7 +118,10 @@ public class BlogController {
 
         redisUtils.decr("blogTotal", 1);
 
-        rabbitTemplate.convertAndSend("topicExchange", "blog.delete", blog.getId());
+        BlogMqDTO blogMqDTO = new BlogMqDTO();
+        blogMqDTO.setType("delete");
+        blogMqDTO.setBlog(temp);
+        rabbitTemplate.convertAndSend("topicExchange", "blog", blogMqDTO);
 
         return new Result<>(200, "删除成功");
 

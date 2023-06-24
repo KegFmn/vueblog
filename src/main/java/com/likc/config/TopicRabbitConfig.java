@@ -9,18 +9,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class TopicRabbitConfig {
-    private final static String SAVE = "blog.save";
-    private final static String DELETE = "blog.delete";
+    private final static String BLOG = "blog";
     private final static String TOPIC = "topicExchange";
 
     @Bean
-    public Queue saveQueue() {
-        return new Queue(TopicRabbitConfig.SAVE);
-    }
-
-    @Bean
-    public Queue deleteQueue() {
-        return new Queue(TopicRabbitConfig.DELETE);
+    public Queue blogQueue() {
+        return new Queue(TopicRabbitConfig.BLOG);
     }
 
     @Bean
@@ -30,12 +24,7 @@ public class TopicRabbitConfig {
 
     @Bean
     public Binding bindingSaveExchangeMessage() {
-        return BindingBuilder.bind(saveQueue()).to(topicExchange()).with(SAVE);
-    }
-
-    @Bean
-    public Binding bindingDeleteExchangeMessage() {
-        return BindingBuilder.bind(deleteQueue()).to(topicExchange()).with(DELETE);
+        return BindingBuilder.bind(blogQueue()).to(topicExchange()).with(BLOG);
     }
 
 }
